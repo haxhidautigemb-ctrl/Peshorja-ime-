@@ -134,12 +134,8 @@ button.pri:active{transform:translateY(1px)}
 #newform .btns2{display:flex;gap:10px}#newform .btns2 button{flex:1}
 .mini{width:100%;margin-top:10px}
 .est{margin-top:8px}
-.est .eb{position:relative;touch-action:none;user-select:none;-webkit-user-select:none;width:120px;height:230px;margin:10px auto 0;cursor:ns-resize}
-.est .en{position:absolute;left:46px;top:0;width:28px;height:40px;border:2px solid var(--ink);border-bottom:0;border-radius:7px 7px 0 0;background:var(--bg)}
-.est .ebd{position:absolute;left:0;right:0;top:30px;bottom:0;border:2px solid var(--ink);border-radius:34px 34px 14px 14px;overflow:hidden;background:var(--bg)}
-.est .ef{position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(var(--liq2),var(--liq))}
-.est .el{position:absolute;left:-10px;right:-10px;height:0;border-top:3px solid #2f5bff;pointer-events:none}
-.est .el:after{content:"";position:absolute;right:-2px;top:-9px;width:14px;height:14px;border-radius:50%;background:#2f5bff}
+.est .eb{position:relative;touch-action:none;user-select:none;-webkit-user-select:none;width:140px;margin:10px auto 0;cursor:ns-resize}
+.est .eb svg{display:block;width:140px;margin:0 auto;overflow:visible}
 .est .eq{display:flex;gap:6px;margin-top:10px}
 .est .eq button{flex:1;min-height:40px}
 .est .eh{font-size:13px;color:var(--mute);margin:8px 0 0;text-align:center}
@@ -330,7 +326,7 @@ button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touc
 <details class="est" id="estd">
 <summary>📏 Pa peshore? Vendos vijën (përafërsisht)</summary>
 <p class="eh">Tërhiq vijën blu aty ku arrin lëngu në shishe, ose shtyp një nga butonat.</p>
-<div class="eb" id="eb"><div class="en"></div><div class="ebd"><div class="ef" id="ef"></div></div><div class="el" id="el" style="bottom:0"></div></div>
+<div class="eb" id="eb"><svg id="esvg" viewBox="0 0 120 230" height="230" aria-hidden="true"><defs><clipPath id="ecl"><path id="ecp" d=""/></clipPath></defs><path id="eglass" d="" style="fill:var(--bg)"/><rect id="eliq" x="0" y="224" width="120" height="0" clip-path="url(#ecl)" style="fill:#d98a14"/><path id="eout" d="" style="fill:none;stroke:var(--ink);stroke-width:3;stroke-linejoin:round"/><line id="eln" x1="-8" x2="128" y1="224" y2="224" stroke="#2f5bff" stroke-width="3"/><circle id="edt" cx="126" cy="224" r="7" fill="#2f5bff"/></svg></div>
 <div class="eq"><button type="button" data-p="0">0</button><button type="button" data-p="25">¼</button><button type="button" data-p="50">½</button><button type="button" data-p="75">¾</button><button type="button" data-p="100">Plot</button></div>
 <p class="eh" id="ep">Niveli: 0%</p>
 </details>
@@ -554,23 +550,48 @@ $('totv').textContent=(tm/1000).toFixed(2)+' L · '+Math.round(td*10)/10+' doza'
 $('acts').hidden=!items.length;$('savebox').hidden=!items.length;
 if(!items.length)$('cp').hidden=true;
 }
-function pick(){const q=$('type').value.split('|');$('vol').value=sizes[q[2]]||q[3];loadW();calc()}
+function pick(){const q=$('type').value.split('|');$('vol').value=sizes[q[2]]||q[3];loadW();calc();if(typeof drawEst==='function')drawEst()}
 $('vol').addEventListener('change',()=>{const q=$('type').value.split('|');sizes[q[2]]=$('vol').value;try{localStorage.setItem('imebar_sizes',JSON.stringify(sizes))}catch(e){}touched=true;sync();loadW();calc()});
 ['full','empty'].forEach(i=>$(i).addEventListener('input',saveW));
 $('type').addEventListener('change',()=>{$('cur').value='';estReset();pick()});
 function efOf(){const v=+$('vol').value,fR=$('full').value.trim(),eR=$('empty').value.trim();let dens=+$('type').value.split('|')[0],e,f;
 if(fR!==''&&eR!==''){f=+fR;e=+eR}else if(fR!==''){f=+fR;e=f-v*dens}else if(eR!==''){e=+eR;f=e+v*dens}else{e=GLASS[v]||480;f=e+v*dens}
 return{e:e,f:f}}
-function setEst(p){p=Math.max(0,Math.min(100,Math.round(p)));$('ef').style.height=(p/100*100)+'%';$('el').style.bottom=(p/100*(230-30)-1.5)+'px';$('ep').textContent='Niveli: '+p+'%';
-const o=efOf();if(!(o.f>o.e))return;$('cur').value=Math.round(o.e+p/100*(o.f-o.e));EST=true;calc()}
-function estReset(){EST=false;$('ef').style.height='0%';$('el').style.bottom='0px';$('ep').textContent='Niveli: 0%'}
+const SHP={
+vodka:{t:80,d:'M50 8H70V62Q70 82 90 100V214Q90 224 80 224H40Q30 224 30 214V100Q50 82 50 62Z'},
+xhin:{t:74,d:'M50 10H70V54Q70 70 94 86V214Q94 224 84 224H36Q26 224 26 214V86Q50 70 50 54Z'},
+uiski:{t:70,d:'M48 14H72V50Q72 66 98 88V214Q98 224 88 224H32Q22 224 22 214V88Q48 66 48 50Z'},
+konjak:{t:72,d:'M50 14H70V56Q112 80 108 150Q106 224 80 224H40Q14 224 12 150Q8 80 50 56Z'},
+rum:{t:76,d:'M48 12H72V56Q72 72 94 92V214Q94 224 84 224H36Q26 224 26 214V92Q48 72 48 56Z'},
+tekila:{t:64,d:'M46 12H74V44Q74 56 96 70V214Q96 224 86 224H34Q24 224 24 214V70Q46 56 46 44Z'},
+liker:{t:98,d:'M48 40H72V80Q100 96 100 120V214Q100 224 90 224H30Q20 224 20 214V120Q20 96 48 80Z'},
+aper:{t:80,d:'M50 10H70V60Q92 78 92 104V214Q92 224 82 224H38Q28 224 28 214V104Q28 78 50 60Z'},
+birre:{t:110,d:'M52 10H68V80Q70 110 84 130V214Q84 224 74 224H46Q36 224 36 214V130Q50 110 52 80Z'}};
+const GSH={'Vodka':'vodka','Uiski':'uiski','Konjak dhe brandy':'konjak','Rakia':'vodka','Rum':'rum','Xhin':'xhin','Tekila':'tekila','Liker':'liker','Aperitiv dhe të tjera':'aper','Birrë':'birre'};
+const GCOL={'Vodka':'#dcecf7','Uiski':'#c9821e','Konjak dhe brandy':'#a8561a','Rakia':'#e6f0f5','Rum':'#b86f1c','Xhin':'#e0eef0','Tekila':'#ecd9a0','Liker':'#a2542f','Aperitiv dhe të tjera':'#d9552b','Birrë':'#e8b02a'};
+const NCOL=[[/campari/,'#c4162a'],[/aperol/,'#f26a1b'],[/j[aä]germeister|jager/,'#2a1a10'],[/baileys/,'#d9c3a0'],[/malibu/,'#eef2f2'],[/amaretto|disaronno/,'#8a4a1a'],[/limoncello/,'#f0e04a'],[/fernet/,'#2b1a12'],[/sambuk|sambuc/,'#eef2f2'],[/cointreau|triple sec/,'#eef2f2'],[/pernod|ouzo|ricard|pastis/,'#e8ecd0']];
+var EP=0;
+function estShape(){const o=$('type').selectedOptions[0],g=o&&o.parentElement&&o.parentElement.label||'',nm=($('type').value.split('|')[2]||'').toLowerCase();
+let col=GCOL[g]||'#d98a14';for(const r of NCOL){if(r[0].test(nm)){col=r[1];break}}
+return{sh:SHP[GSH[g]]||SHP.vodka,col:col}}
+function drawEst(){const s=estShape(),v=+$('vol').value||700;
+const h=Math.round(150+(Math.max(200,Math.min(1000,v))-200)/800*80);$('esvg').setAttribute('height',h);
+['ecp','eglass','eout'].forEach(i=>$(i).setAttribute('d',s.sh.d));$('eliq').style.fill=s.col;
+EH=s.sh.t;placeEst()}
+var EH=80;
+function placeEst(){const y=224-EP/100*(224-EH);$('eliq').setAttribute('y',y);$('eliq').setAttribute('height',224-y+2);$('eln').setAttribute('y1',y);$('eln').setAttribute('y2',y);$('edt').setAttribute('cy',y);$('ep').textContent='Niveli: '+EP+'%'}
+function setEst(p){EP=Math.max(0,Math.min(100,Math.round(p)));placeEst();
+const o=efOf();if(!(o.f>o.e))return;$('cur').value=Math.round(o.e+EP/100*(o.f-o.e));EST=true;calc()}
+function estReset(){EST=false;EP=0;drawEst()}
 (function(){const eb=$('eb');let dr=false;
-function at(ev){const r=eb.getBoundingClientRect(),bot=r.bottom,top=r.top+30;const y=Math.max(top,Math.min(bot,ev.clientY));setEst((bot-y)/(bot-top)*100)}
+function at(ev){const r=$('esvg').getBoundingClientRect(),k=r.height/230,bot=r.top+224*k,top=r.top+EH*k;const y=Math.max(top,Math.min(bot,ev.clientY));setEst((bot-y)/(bot-top)*100)}
 eb.addEventListener('pointerdown',ev=>{dr=true;try{eb.setPointerCapture(ev.pointerId)}catch(e){}at(ev);ev.preventDefault()});
 eb.addEventListener('pointermove',ev=>{if(dr)at(ev)});
 ['pointerup','pointercancel'].forEach(n=>eb.addEventListener(n,()=>{dr=false}));
 document.querySelectorAll('#estd .eq button').forEach(b=>b.addEventListener('click',()=>setEst(+b.dataset.p)));
-$('cur').addEventListener('input',()=>{if(EST){EST=false;$('ef').style.height='0%';$('el').style.bottom='0px';$('ep').textContent='Niveli: 0%';calc()}});
+$('cur').addEventListener('input',()=>{if(EST){EST=false;EP=0;placeEst();calc()}});
+$('vol').addEventListener('change',()=>{drawEst()});
+drawEst();
 })();
 
 ['vol','dose','full','empty','cur'].forEach(i=>{$(i).addEventListener('input',calc);$(i).addEventListener('change',calc)});
