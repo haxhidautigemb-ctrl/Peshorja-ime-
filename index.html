@@ -373,6 +373,15 @@ button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touc
 <button id="cpall" type="button">Kopjo të gjitha</button>
 <button id="xlall" type="button">Excel të gjitha</button>
 </div>
+<div class="savebox" id="cmpbox" hidden>
+<h2 style="margin-bottom:6px">Konsumi mes dy inventarëve</h2>
+<p class="hint">Zgjidh inventarin e vjetër (para) dhe atë të ri (pas). Aplikacioni tregon sa u konsumua nga çdo pije.</p>
+<label for="cmpa">Para (më i vjetri)<select id="cmpa"></select></label>
+<label for="cmpb" style="margin-top:8px">Pas (më i riu)<select id="cmpb"></select></label>
+<button type="button" class="pri" id="cmpgo" style="margin-top:12px">Llogarit konsumin</button>
+<div id="cmpres" style="margin-top:10px"></div>
+<div class="acts" id="cmpacts" hidden><button id="cmpcp" type="button">Kopjo</button><button id="cmpxl" type="button">Excel</button></div>
+</div>
 <div class="savebox" style="margin-top:18px">
 <h2 style="margin-bottom:6px">Kopja rezervë</h2>
 <p class="hint">Ruan në një skedar pijet që i ke shtuar, peshat dhe shanqet e ruajtura. Nëse ndonjëherë humbet diçka, e kthen nga ai skedar.</p>
@@ -491,7 +500,7 @@ $('tgtn').textContent='Po ndryshon peshën: '+x.name;$('add').textContent='Ruaj 
 $('tab1').onclick=()=>{setView(1)};$('tab2').onclick=()=>setView(2);
 function renderSaved(){
 const S=$('saved');S.textContent='';
-$('cnt').textContent=saved.length;$('svempty').hidden=!!saved.length;$('allacts').hidden=saved.length<2;
+$('cnt').textContent=saved.length;$('svempty').hidden=!!saved.length;if(typeof fillCmp==='function')fillCmp();$('allacts').hidden=saved.length<2;
 saved.forEach(r=>{
 const t=sums(r.items);
 const row=document.createElement('div');row.className='row sr';
@@ -513,6 +522,41 @@ arm(bd,'Fshi',()=>{saved=saved.filter(x=>x.id!==r.id);saveLocalSaved();if(COL)CO
 row.append(n,bt);const wr=document.createElement('div');wr.append(row,dt);S.appendChild(wr);
 });
 }
+
+let CMPROWS=null,CMPTXT='',CMPNAME='';
+function fillCmp(){const B=$('cmpbox');if(!B)return;const rs=ordered();B.hidden=rs.length<2;if(rs.length<2)return;
+const ka=$('cmpa').value,kb=$('cmpb').value;
+['cmpa','cmpb'].forEach(i=>{const s=$(i);s.textContent='';rs.forEach(r=>{const o=document.createElement('option');o.value=r.id;o.textContent=r.name+' · '+dstr(r.date);s.appendChild(o)})});
+const has=k=>rs.some(r=>r.id===k);
+$('cmpa').value=has(ka)?ka:rs[rs.length-2].id;$('cmpb').value=has(kb)?kb:rs[rs.length-1].id}
+function calcCmp(){const R=$('cmpres');R.textContent='';$('cmpacts').hidden=true;CMPROWS=null;
+const ra=saved.find(x=>x.id===$('cmpa').value),rb=saved.find(x=>x.id===$('cmpb').value);
+const msg=t=>{const p=document.createElement('p');p.className='hint';p.textContent=t;R.appendChild(p)};
+if(!ra||!rb)return msg('Zgjidh dy inventarë.');
+if(ra.id===rb.id)return msg('Zgjidh dy inventarë të ndryshëm.');
+const A={},Bm={};aggregate([ra]).forEach(e=>{A[e.name]=e.ml});aggregate([rb]).forEach(e=>{Bm[e.name]=e.ml});
+const names=Object.keys(Object.assign({},A,Bm)).sort((x,y)=>x.localeCompare(y));
+const rows=[['Pija','Para (L)','Pas (L)','Konsumuar (L)','Konsumuar (ml)','Doza (4 cl)']];let tot=0,td=0,up=0,solo=0;
+const lines=['Konsumi: '+ra.name+' ('+dstr(ra.date)+') → '+rb.name+' ('+dstr(rb.date)+')'];
+names.forEach(n=>{const a=A[n],b=Bm[n],d=document.createElement('div');d.className='di';const s=document.createElement('span'),v=document.createElement('b');
+if(a!==undefined&&b!==undefined){const c=a-b,ds=Math.round(c/40*10)/10;
+s.textContent=n+' · '+L2(a)+' → '+L2(b)+' L';
+if(c>=0){v.textContent=L2(c)+' L · '+ds+' doza';tot+=c;td+=ds;rows.push([n,+L2(a),+L2(b),+L2(c),c,ds]);lines.push(n+': '+L2(c)+' L ('+ds+' doza)')}
+else{v.textContent='+'+L2(-c)+' L shtuar';up++;rows.push([n,+L2(a),+L2(b),'shtuar',c,'']);lines.push(n+': shtuar +'+L2(-c)+' L')}}
+else{solo++;s.textContent=n+(a!==undefined?' · vetëm te "Para"':' · vetëm te "Pas"');v.textContent='nuk krahasohet';rows.push([n,a!==undefined?+L2(a):'',b!==undefined?+L2(b):'','nuk krahasohet','','']);lines.push(n+': nuk krahasohet')}
+d.append(s,v);R.appendChild(d)});
+td=Math.round(td*10)/10;
+const t=document.createElement('div');t.className='di tt';const ta=document.createElement('span');ta.textContent='Konsumi gjithsej';const tb=document.createElement('b');tb.textContent=L2(tot)+' L · '+td+' doza';t.append(ta,tb);R.appendChild(t);
+rows.push(['Konsumi gjithsej','','',+L2(tot),tot,td]);lines.push('Konsumi gjithsej: '+L2(tot)+' L · '+td+' doza');
+if(up)msg(up+' pije kanë më shumë se më parë (u shtuan ose u plotësuan), prandaj nuk numërohen si konsum.');
+if(solo)msg(solo+' pije janë vetëm në njërin inventar, prandaj nuk krahasohen.');
+CMPROWS=rows;CMPTXT=lines.join('\n');CMPNAME='Konsumi_'+ra.name+'_'+rb.name;$('cmpacts').hidden=false}
+$('cmpgo').onclick=calcCmp;
+$('cmpa').onchange=$('cmpb').onchange=()=>{$('cmpres').textContent='';$('cmpacts').hidden=true};
+$('cmpcp').onclick=()=>{if(CMPTXT)copyText(CMPTXT)};
+$('cmpxl').onclick=async()=>{if(!CMPROWS)return;const rows=CMPROWS,iso=new Date().toISOString();
+if(window.XLSX){const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:34},{wch:12},{wch:12},{wch:14},{wch:14},{wch:12}];const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Konsumi');await saveFile(fileBase(CMPNAME,iso)+'.xlsx',XLSX.write(wb,{bookType:'xlsx',type:'array'}))}
+else{await saveFile(fileBase(CMPNAME,iso)+'.csv','\ufeff'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(';')).join('\r\n'))}};
 $('cpall').onclick=()=>copyText(txtAll());
 $('xlall').onclick=()=>exportAll();
 $('copy').onclick=()=>copyText(txtOf($('sname').value.trim()||'Bar1',new Date().toISOString(),items));
