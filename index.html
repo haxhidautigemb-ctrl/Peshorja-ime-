@@ -139,6 +139,7 @@ button.pri:active{transform:translateY(1px)}
 .est .eq{display:flex;gap:6px;margin-top:10px}
 .est .eq button{flex:1;min-height:40px}
 .est .eh{font-size:13px;color:var(--mute);margin:8px 0 0;text-align:center}
+.est #ep{font-size:19px;font-weight:700;color:var(--ink)}
 
 button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 </style>
@@ -661,7 +662,7 @@ EK=s.k;EH=s.sh.t;placeEst()}
 var EH=80;
 function placeEst(){const y=yOf(EK,EP);$('eliq').setAttribute('y',y);$('eliq').setAttribute('height',224-y+2);$('eln').setAttribute('y1',y);$('eln').setAttribute('y2',y);$('edt').setAttribute('cy',y);$('ep').textContent='Niveli: '+EP+'%'}
 function setEst(p){EP=Math.max(0,Math.min(100,Math.round(p)));placeEst();
-const o=efOf();if(!(o.f>o.e))return;$('cur').value=Math.round(o.e+EP/100*(o.f-o.e));EST=true;calc()}
+const o=efOf();if(!(o.f>o.e))return;$('cur').value=Math.round(o.e+EP/100*(o.f-o.e));EST=true;calc();if(cur)$('ep').textContent='Niveli: '+EP+'% · '+L2(cur.ml)+' L · '+cur.doses+' doza'}
 function estReset(){EST=false;EP=0;drawEst()}
 (function(){const eb=$('eb');let dr=false;
 function at(ev){const r=$('esvg').getBoundingClientRect(),k=r.height/230,bot=r.top+224*k,top=r.top+EH*k;const y=Math.max(top,Math.min(bot,ev.clientY));setEst(pOf(EK,(y-r.top)/k))}
