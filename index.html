@@ -151,6 +151,15 @@ button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touc
 <div class="tabs" role="tablist"><button type="button" id="tab1" role="tab" aria-selected="true">Peshorja</button><button type="button" id="tab2" role="tab" aria-selected="false">Të ruajturat<b id="cnt">0</b></button></div>
 <div class="tgt" id="tgt" hidden><span id="tgtn"></span><button type="button" id="tgtx">Mbaro</button></div>
 
+<div class="card" id="qbar" hidden>
+<div class="head"><h2>⚡ Inventar i shpejtë</h2><small id="qcnt" style="color:var(--mute)"></small></div>
+<p style="margin:0 0 4px;font-weight:700;font-size:18px" id="qname"></p>
+<p class="hint" id="qinfo" style="margin:0 0 8px"></p>
+<p class="hint">Tërhiq vijën ose shkruaj peshën, pastaj shtyp "Shto dhe tjetra". Nëse nuk e ke pijen, shtyp "Kapërce".</p>
+<div class="acts"><button type="button" id="qprev">← Mbrapa</button><button type="button" id="qskip">Kapërce</button></div>
+<div class="acts"><button type="button" class="pri" id="qnext">Shto dhe tjetra</button><button type="button" id="qstop">Mbaro</button></div>
+<p class="msg" id="qmsg" role="status"></p>
+</div>
 <section class="card stack vm" aria-label="Zgjidhja e pijes">
 <div>
 <label for="q">Kërko pijen</label>
@@ -164,6 +173,7 @@ button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touc
 <div id="mylist" hidden></div>
 <button type="button" class="lnk" id="towbtn" style="margin-top:6px">⚖️ Për t'u peshuar (0)</button>
 <div id="towlist" hidden></div>
+<button type="button" class="lnk" id="qbtn" style="margin-top:6px">⚡ Inventar i shpejtë (me vijë)</button>
 <div id="newform" hidden>
 <h3>Pije e re</h3>
 <label for="nn">Emri i pijes<input id="nn" type="text" maxlength="40" placeholder="p.sh. Vodka Zubrowka" autocomplete="off"></label>
@@ -435,7 +445,7 @@ function pad(n){return String(n).padStart(2,'0')}
 function dstr(iso){const d=new Date(iso);return pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear()}
 function L2(ml){return (ml/1000).toFixed(2)}
 function sums(list){let ml=0,ds=0;list.forEach(x=>{ml+=x.ml;ds+=x.doses});return{ml:ml,ds:Math.round(ds*10)/10}}
-function txtOf(name,iso,list){const t=sums(list);return ['Inventari '+name+' · '+dstr(iso)].concat(list.map(x=>x.name+': '+L2(x.ml)+' L ('+x.pct+'%) · '+x.doses+' doza')).concat(['Totali: '+L2(t.ml)+' L · '+t.ds+' doza']).join('\n')}
+function txtOf(name,iso,list){const t=sums(list);return ['Inventari '+name+' · '+dstr(iso)].concat(list.map(x=>(x.est?'≈ ':'')+x.name+': '+L2(x.ml)+' L ('+x.pct+'%) · '+x.doses+' doza')).concat(['Totali: '+L2(t.ml)+' L · '+t.ds+' doza']).join('\n')}
 function say(t){const m=$('msg');m.textContent=t;clearTimeout(say.t);say.t=setTimeout(()=>{m.textContent=''},6000)}
 async function copyText(t){
 try{await navigator.clipboard.writeText(t);$('cp').hidden=true;say('U kopjua. Ngjite në Notes ose në email.');return}catch(e){}
@@ -446,7 +456,7 @@ async function saveFile(fn,data){
 try{const dl=window.claude&&window.claude.use?await window.claude.use('downloads'):null;if(dl){await dl.save({filename:fn,data:data});say('Skedari është gati.');return}}catch(e){if(e&&e.code==='declined')return}
 try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data]));a.download=fn;document.body.appendChild(a);a.click();a.remove();say('Skedari u shkarkua.')}catch(e){say('Shkarkimi nuk punon këtu. Përdor "Kopjo".')}
 }
-function rowsFor(list){const t=sums(list);return [['Pija','Mbetur (L)','Mbetur (ml)','Përqindja (%)','Doza (4 cl)']].concat(list.map(x=>[x.name,+L2(x.ml),x.ml,x.pct,x.doses])).concat([['Totali',+L2(t.ml),t.ml,'',t.ds]])}
+function rowsFor(list){const t=sums(list);return [['Pija','Mbetur (L)','Mbetur (ml)','Përqindja (%)','Doza (4 cl)']].concat(list.map(x=>[(x.est?'≈ ':'')+x.name,+L2(x.ml),x.ml,x.pct,x.doses])).concat([['Totali',+L2(t.ml),t.ml,'',t.ds]])}
 function aggregate(recs){const m={};recs.forEach(r=>r.items.forEach(x=>{const e=m[x.name]||(m[x.name]={name:x.name,ml:0,doses:0,n:0});e.ml+=x.ml;e.doses+=x.doses;e.n++}));return Object.keys(m).sort((a,b)=>a.localeCompare(b)).map(k=>({name:k,ml:m[k].ml,doses:Math.round(m[k].doses*10)/10,n:m[k].n}))}
 function ordered(){return saved.slice().sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.name.localeCompare(b.name,undefined,{numeric:true}))}
 function sumRows(ag){let ml=0,ds=0;ag.forEach(e=>{ml+=e.ml;ds+=e.doses});ds=Math.round(ds*10)/10;return [['Pija','Mbetur (L)','Mbetur (ml)','Doza (4 cl)','Shishe']].concat(ag.map(e=>[e.name,+L2(e.ml),e.ml,e.doses,e.n])).concat([['Totali',+L2(ml),ml,ds,'']])}
@@ -486,7 +496,7 @@ function alert0(){const b=$('tab2');b.textContent='Pastro listën fillimisht';se
 function arm(btn,label,fn){let t=null;btn.onclick=()=>{if(t===null){btn.textContent='Sigurt?';t=setTimeout(()=>{t=null;btn.textContent=label},3000);return}clearTimeout(t);t=null;btn.textContent=label;fn()}}
 function saveLocalSaved(){try{localStorage.setItem('imebar_saved',JSON.stringify(saved))}catch(e){}}
 let view=1,target=null,edit=null;
-function setView(v){view=v;document.querySelectorAll('.vm').forEach(e=>e.hidden=v!==1);$('savedcard').hidden=v!==2;$('tab1').setAttribute('aria-selected',v===1);$('tab2').setAttribute('aria-selected',v===2);$('listcard').hidden=v!==1||!!target;$('tgt').hidden=!((target||edit)&&v===1);window.scrollTo({top:0})}
+function setView(v){view=v;document.querySelectorAll('.vm').forEach(e=>e.hidden=v!==1);$('savedcard').hidden=v!==2;$('tab1').setAttribute('aria-selected',v===1);$('tab2').setAttribute('aria-selected',v===2);$('listcard').hidden=v!==1||!!target;$('tgt').hidden=!((target||edit)&&v===1);if($('qbar'))$('qbar').hidden=!(window.QON&&v===1);window.scrollTo({top:0})}
 function endEdit(){const w=edit&&edit.rec?2:1;edit=null;$('add').textContent='Shto në listë';$('cur').value='';calc();setView(w)}
 $('tgtx').onclick=()=>{if(edit){endEdit();return}target=null;setView(2)};
 function startEdit(arr,idx,rec){
@@ -512,7 +522,7 @@ const bt=document.createElement('div');bt.className='btns';
 const mk=(label)=>{const b=document.createElement('button');b.type='button';b.textContent=label;bt.appendChild(b);return b};
 const bp=mk('Shto pije'),bo=mk('Hap'),bc=mk('Kopjo'),bx=mk('Excel'),bd=mk('Fshi');
 const dt=document.createElement('div');dt.className='det';dt.hidden=true;
-r.items.forEach((x,xi)=>{const d=document.createElement('div');d.className='di';const a1=document.createElement('span');a1.textContent=x.name;const b1=document.createElement('b');b1.textContent=(x.ml/1000).toFixed(2)+' L · '+x.pct+'%';const be=document.createElement('button');be.type='button';be.textContent='Ndrysho';be.style.cssText='margin:0 0 0 8px;width:auto;padding:4px 10px;font-size:13px';be.onclick=()=>startEdit(r.items,xi,r);d.append(a1,b1,be);dt.appendChild(d)});
+r.items.forEach((x,xi)=>{const d=document.createElement('div');d.className='di';const a1=document.createElement('span');a1.textContent=(x.est?'≈ ':'')+x.name;const b1=document.createElement('b');b1.textContent=(x.ml/1000).toFixed(2)+' L · '+x.pct+'%';const be=document.createElement('button');be.type='button';be.textContent='Ndrysho';be.style.cssText='margin:0 0 0 8px;width:auto;padding:4px 10px;font-size:13px';be.onclick=()=>startEdit(r.items,xi,r);d.append(a1,b1,be);dt.appendChild(d)});
 const tt=document.createElement('div');tt.className='di tt';const ta=document.createElement('span');ta.textContent='Totali';const tb=document.createElement('b');tb.textContent=L2(t.ml)+' L';tt.append(ta,tb);dt.appendChild(tt);
 bp.onclick=()=>{target=r;$('tgtn').textContent='Po shton te '+r.name+' ('+r.items.length+' shishe)';setView(1)};
 bo.onclick=()=>{dt.hidden=!dt.hidden;bo.textContent=dt.hidden?'Hap':'Mbyll'};
@@ -557,6 +567,22 @@ $('cmpcp').onclick=()=>{if(CMPTXT)copyText(CMPTXT)};
 $('cmpxl').onclick=async()=>{if(!CMPROWS)return;const rows=CMPROWS,iso=new Date().toISOString();
 if(window.XLSX){const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:34},{wch:12},{wch:12},{wch:14},{wch:14},{wch:12}];const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Konsumi');await saveFile(fileBase(CMPNAME,iso)+'.xlsx',XLSX.write(wb,{bookType:'xlsx',type:'array'}))}
 else{await saveFile(fileBase(CMPNAME,iso)+'.csv','\ufeff'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(';')).join('\r\n'))}};
+
+window.QON=false;
+function qList(){return [...$('type').options].filter(o=>!/tjetër$/i.test(o.value.split('|')[2]||'')&&!o.disabled&&o.parentElement)}
+function qIdx(){return qList().indexOf($('type').selectedOptions[0])}
+function qShow(){const L=qList(),i=qIdx(),o=$('type').selectedOptions[0];if(!o)return;
+$('qcnt').textContent='Pija '+(i+1)+' / '+L.length;$('qname').textContent=o.value.split('|')[2];
+const inl=items.some(it=>it.t===$('type').value&&it.v===$('vol').value);
+$('qinfo').textContent=(o.parentElement.label||'')+(inl?' · ✓ tashmë në listë':'');$('qmsg').textContent=''}
+function qGo(i){const L=qList();if(i<0)i=0;if(i>=L.length){$('qmsg').textContent='Kalove gjithë listën. Shtyp "Mbaro", pastaj "Ruaj" poshtë listës.';return}
+$('type').selectedIndex=[...$('type').options].indexOf(L[i]);$('cur').value='';estReset();pick();$('estd').open=true;qShow();$('qbar').scrollIntoView({block:'start'})}
+var EORIG={p:$('estd').parentNode,n:$('estd').nextSibling};
+$('qbtn').onclick=()=>{window.QON=true;$('qbar').hidden=false;$('qbar').insertBefore($('estd'),$('qprev').parentNode);qGo(0)};
+$('qprev').onclick=()=>qGo(qIdx()-1);
+$('qskip').onclick=()=>qGo(qIdx()+1);
+$('qnext').onclick=()=>{calc();if(!cur){$('qmsg').textContent='Vendos vijën ose shkruaj peshën, ose shtyp Kapërce.';return}const i=qIdx();$('add').click();qGo(i+1)};
+$('qstop').onclick=()=>{window.QON=false;$('qbar').hidden=true;$('qmsg').textContent='';EORIG.p.insertBefore($('estd'),EORIG.n)};
 $('cpall').onclick=()=>copyText(txtAll());
 $('xlall').onclick=()=>exportAll();
 $('copy').onclick=()=>copyText(txtOf($('sname').value.trim()||'Bar1',new Date().toISOString(),items));
@@ -581,7 +607,7 @@ items.forEach((it,i)=>{
 tm+=it.ml;td+=it.doses;
 const r=document.createElement('div');r.className='row';
 const n=document.createElement('div');n.className='n';
-const a=document.createElement('div');a.className='nm';a.textContent=it.name;
+const a=document.createElement('div');a.className='nm';a.textContent=(it.est?'≈ ':'')+it.name;
 const s=document.createElement('small');s.textContent=(it.ml/1000).toFixed(2)+' L · '+it.pct+'% · '+it.doses+' doza';
 const bar=document.createElement('div');bar.className='bar';const bi=document.createElement('i');bi.style.width=Math.max(0,Math.min(100,it.pct))+'%';bar.appendChild(bi);n.append(a,s,bar);
 const b=document.createElement('button');b.type='button';b.textContent='Fshi';b.setAttribute('aria-label','Fshi '+it.name);
@@ -614,21 +640,31 @@ birre:{t:110,d:'M52 10H68V80Q70 110 84 130V214Q84 224 74 224H46Q36 224 36 214V13
 const GSH={'Vodka':'vodka','Uiski':'uiski','Konjak dhe brandy':'konjak','Rakia':'vodka','Rum':'rum','Xhin':'xhin','Tekila':'tekila','Liker':'liker','Aperitiv dhe të tjera':'aper','Birrë':'birre'};
 const GCOL={'Vodka':'#dcecf7','Uiski':'#c9821e','Konjak dhe brandy':'#a8561a','Rakia':'#e6f0f5','Rum':'#b86f1c','Xhin':'#e0eef0','Tekila':'#ecd9a0','Liker':'#a2542f','Aperitiv dhe të tjera':'#d9552b','Birrë':'#e8b02a'};
 const NCOL=[[/campari/,'#c4162a'],[/aperol/,'#f26a1b'],[/j[aä]germeister|jager/,'#2a1a10'],[/baileys/,'#d9c3a0'],[/malibu/,'#eef2f2'],[/amaretto|disaronno/,'#8a4a1a'],[/limoncello/,'#f0e04a'],[/fernet/,'#2b1a12'],[/sambuk|sambuc/,'#eef2f2'],[/cointreau|triple sec/,'#eef2f2'],[/pernod|ouzo|ricard|pastis/,'#e8ecd0']];
+var PROF={},EK='vodka';
+function profOf(k){if(PROF[k])return PROF[k];const sv=$('esvg'),el=document.createElementNS('http://www.w3.org/2000/svg','path');el.setAttribute('d',SHP[k].d);el.style.visibility='hidden';sv.appendChild(el);
+let L=100;try{L=el.getTotalLength()}catch(e){}const mn=[],mx=[];
+for(let i=0;i<=1600;i++){let p;try{p=el.getPointAtLength(L*i/1600)}catch(e){break}const y=Math.round(p.y);if(y<0||y>224)continue;if(mn[y]===undefined||p.x<mn[y])mn[y]=p.x;if(mx[y]===undefined||p.x>mx[y])mx[y]=p.x}
+sv.removeChild(el);
+let lw=20;const w=[];for(let y=0;y<=224;y++){if(mn[y]!==undefined&&mx[y]!==undefined&&mx[y]-mn[y]>1)lw=mx[y]-mn[y];w[y]=lw}
+const t=SHP[k].t,cum=[];cum[225]=0;cum[224]=0;for(let y=223;y>=0;y--)cum[y]=cum[y+1]+w[y]*w[y];
+return PROF[k]={cum:cum,t:t,tot:cum[t]||1}}
+function pOf(k,y){const P=profOf(k);y=Math.max(P.t,Math.min(224,y));const a=Math.floor(y),f=y-a,c=P.cum[a]*(1-f)+P.cum[Math.min(224,a+1)]*f;return c/P.tot*100}
+function yOf(k,p){const P=profOf(k),tg=Math.max(0,Math.min(100,p))/100*P.tot;if(tg<=0)return 224;for(let y=223;y>=P.t;y--){if(P.cum[y]>=tg){const c0=P.cum[y+1],c1=P.cum[y];return y+1-(tg-c0)/((c1-c0)||1)}}return P.t}
 var EP=0;
 function estShape(){const o=$('type').selectedOptions[0],g=o&&o.parentElement&&o.parentElement.label||'',nm=($('type').value.split('|')[2]||'').toLowerCase();
 let col=GCOL[g]||'#d98a14';for(const r of NCOL){if(r[0].test(nm)){col=r[1];break}}
-return{sh:SHP[GSH[g]]||SHP.vodka,col:col}}
+const k=GSH[g]&&SHP[GSH[g]]?GSH[g]:'vodka';return{k:k,sh:SHP[k],col:col}}
 function drawEst(){const s=estShape(),v=+$('vol').value||700;
 const h=Math.round(150+(Math.max(200,Math.min(1000,v))-200)/800*80);$('esvg').setAttribute('height',h);
 ['ecp','eglass','eout'].forEach(i=>$(i).setAttribute('d',s.sh.d));$('eliq').style.fill=s.col;
-EH=s.sh.t;placeEst()}
+EK=s.k;EH=s.sh.t;placeEst()}
 var EH=80;
-function placeEst(){const y=224-EP/100*(224-EH);$('eliq').setAttribute('y',y);$('eliq').setAttribute('height',224-y+2);$('eln').setAttribute('y1',y);$('eln').setAttribute('y2',y);$('edt').setAttribute('cy',y);$('ep').textContent='Niveli: '+EP+'%'}
+function placeEst(){const y=yOf(EK,EP);$('eliq').setAttribute('y',y);$('eliq').setAttribute('height',224-y+2);$('eln').setAttribute('y1',y);$('eln').setAttribute('y2',y);$('edt').setAttribute('cy',y);$('ep').textContent='Niveli: '+EP+'%'}
 function setEst(p){EP=Math.max(0,Math.min(100,Math.round(p)));placeEst();
 const o=efOf();if(!(o.f>o.e))return;$('cur').value=Math.round(o.e+EP/100*(o.f-o.e));EST=true;calc()}
 function estReset(){EST=false;EP=0;drawEst()}
 (function(){const eb=$('eb');let dr=false;
-function at(ev){const r=$('esvg').getBoundingClientRect(),k=r.height/230,bot=r.top+224*k,top=r.top+EH*k;const y=Math.max(top,Math.min(bot,ev.clientY));setEst((bot-y)/(bot-top)*100)}
+function at(ev){const r=$('esvg').getBoundingClientRect(),k=r.height/230,bot=r.top+224*k,top=r.top+EH*k;const y=Math.max(top,Math.min(bot,ev.clientY));setEst(pOf(EK,(y-r.top)/k))}
 eb.addEventListener('pointerdown',ev=>{dr=true;try{eb.setPointerCapture(ev.pointerId)}catch(e){}at(ev);ev.preventDefault()});
 eb.addEventListener('pointermove',ev=>{if(dr)at(ev)});
 ['pointerup','pointercancel'].forEach(n=>eb.addEventListener(n,()=>{dr=false}));
@@ -642,7 +678,7 @@ drawEst();
 $('add').onclick=()=>{
 calc();if(!cur)return;
 const nm=$('type').value.split('|')[2]+' '+($('vol').selectedOptions[0].text);
-const it={name:nm,ml:cur.ml,pct:cur.pct,doses:cur.doses,t:$('type').value,v:$('vol').value,g:+$('cur').value};
+const it={name:nm,ml:cur.ml,pct:cur.pct,doses:cur.doses,t:$('type').value,v:$('vol').value,g:+$('cur').value};if(EST)it.est=true;
 if(edit){const E=edit;E.arr[E.idx]=it;if(E.rec){saveLocalSaved();if(COL)COL.doc(E.rec.id).set(E.rec).catch(()=>{});renderSaved()}else{save();render()}endEdit();say('✓ Pesha u ndryshua.');return}
 if(target){target.items.push(it);saveLocalSaved();if(COL)COL.doc(target.id).set(target).catch(()=>{});renderSaved();$('tgtn').textContent='✓ U shtua te '+target.name+' ('+target.items.length+' shishe)';return}
 items.push(it);
@@ -674,7 +710,7 @@ R.appendChild(b);
 });
 }
 function choose(o){
-$('type').value=o.value;$('cur').value='';
+$('type').value=o.value;$('cur').value='';if(typeof estReset==='function')estReset();
 $('q').value='';$('sr').hidden=true;$('sr').textContent='';
 pick();$('cur').focus();
 }
