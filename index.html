@@ -140,6 +140,7 @@ button.pri:active{transform:translateY(1px)}
 .est .eq button{flex:1;min-height:40px}
 .est .eh{font-size:13px;color:var(--mute);margin:8px 0 0;text-align:center}
 .est #ep{font-size:19px;font-weight:700;color:var(--ink)}
+#qbar{scroll-margin-top:112px}
 
 button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 </style>
@@ -336,6 +337,7 @@ button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touc
 </details>
 <details class="est" id="estd">
 <summary>📏 Pa peshore? Vendos vijën (përafërsisht)</summary>
+<p class="eh" id="qn2" style="display:none;font-size:20px;font-weight:700;color:var(--ink)"></p>
 <p class="eh">Tërhiq vijën blu aty ku arrin lëngu në shishe, ose shtyp një nga butonat.</p>
 <div class="eb" id="eb"><svg id="esvg" viewBox="0 0 120 230" height="230" aria-hidden="true"><defs><clipPath id="ecl"><path id="ecp" d=""/></clipPath></defs><path id="eglass" d="" style="fill:var(--bg)"/><rect id="eliq" x="0" y="224" width="120" height="0" clip-path="url(#ecl)" style="fill:#d98a14"/><path id="eout" d="" style="fill:none;stroke:var(--ink);stroke-width:3;stroke-linejoin:round"/><line id="eln" x1="-8" x2="128" y1="224" y2="224" stroke="#2f5bff" stroke-width="3"/><circle id="edt" cx="126" cy="224" r="7" fill="#2f5bff"/></svg></div>
 <div class="eq"><button type="button" data-p="0">0</button><button type="button" data-p="25">¼</button><button type="button" data-p="50">½</button><button type="button" data-p="75">¾</button><button type="button" data-p="100">Plot</button></div>
@@ -573,7 +575,7 @@ window.QON=false;
 function qList(){return [...$('type').options].filter(o=>!/tjetër$/i.test(o.value.split('|')[2]||'')&&!o.disabled&&o.parentElement)}
 function qIdx(){return qList().indexOf($('type').selectedOptions[0])}
 function qShow(){const L=qList(),i=qIdx(),o=$('type').selectedOptions[0];if(!o)return;
-$('qcnt').textContent='Pija '+(i+1)+' / '+L.length;$('qname').textContent=o.value.split('|')[2];
+$('qcnt').textContent='Pija '+(i+1)+' / '+L.length;$('qname').textContent=o.value.split('|')[2];$('qn2').textContent=o.value.split('|')[2]+' · '+(i+1)+'/'+L.length;$('qn2').style.display='block';
 const inl=items.some(it=>it.t===$('type').value&&it.v===$('vol').value);
 $('qinfo').textContent=(o.parentElement.label||'')+(inl?' · ✓ tashmë në listë':'');$('qmsg').textContent=''}
 function qGo(i){const L=qList();if(i<0)i=0;if(i>=L.length){$('qmsg').textContent='Kalove gjithë listën. Shtyp "Mbaro", pastaj "Ruaj" poshtë listës.';return}
@@ -583,7 +585,7 @@ $('qbtn').onclick=()=>{window.QON=true;$('qbar').hidden=false;$('qbar').insertBe
 $('qprev').onclick=()=>qGo(qIdx()-1);
 $('qskip').onclick=()=>qGo(qIdx()+1);
 $('qnext').onclick=()=>{calc();if(!cur){$('qmsg').textContent='Vendos vijën ose shkruaj peshën, ose shtyp Kapërce.';return}const i=qIdx();$('add').click();qGo(i+1)};
-$('qstop').onclick=()=>{window.QON=false;$('qbar').hidden=true;$('qmsg').textContent='';EORIG.p.insertBefore($('estd'),EORIG.n)};
+$('qstop').onclick=()=>{window.QON=false;$('qbar').hidden=true;$('qmsg').textContent='';$('qn2').style.display='none';EORIG.p.insertBefore($('estd'),EORIG.n)};
 $('cpall').onclick=()=>copyText(txtAll());
 $('xlall').onclick=()=>exportAll();
 $('copy').onclick=()=>copyText(txtOf($('sname').value.trim()||'Bar1',new Date().toISOString(),items));
