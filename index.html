@@ -134,8 +134,8 @@ button.pri:active{transform:translateY(1px)}
 #newform .btns2{display:flex;gap:10px}#newform .btns2 button{flex:1}
 .mini{width:100%;margin-top:10px}
 .est{margin-top:8px}
-.est .eb{position:relative;touch-action:none;user-select:none;-webkit-user-select:none;width:140px;margin:10px auto 0;cursor:ns-resize}
-.est .eb svg{display:block;width:140px;margin:0 auto;overflow:visible}
+.est .eb{position:relative;touch-action:none;user-select:none;-webkit-user-select:none;width:230px;margin:10px auto 0;cursor:ns-resize}
+.est .eb svg{display:block;width:210px;margin:0 auto;overflow:visible}
 .est .eq{display:flex;gap:6px;margin-top:10px}
 .est .eq button{flex:1;min-height:40px}
 .est .eh{font-size:13px;color:var(--mute);margin:8px 0 0;text-align:center}
@@ -335,7 +335,7 @@ button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touc
 <button type="button" class="mini" id="wsave">Ruaj peshën</button>
 <button type="button" class="mini" id="wdel" hidden>Fshi këtë pije</button>
 </details>
-<style>#epg{display:none}#esvg.ph #epg{display:block}#esvg.ph #eglass,#esvg.ph .lq,#esvg.ph #eov,#esvg.ph #eout,#esvg.ph #ehl1,#esvg.ph #ehl2,#esvg.ph #ecap{display:none}</style>
+<style>#epg{display:none}#esvg.ph #epg{display:block}#esvg.ph #eglass,#esvg.ph .lq,#esvg.ph #eov,#esvg.ph #eout,#esvg.ph #ehl1,#esvg.ph #ehl2,#esvg.ph #ecap{display:none}#esvg.ph #epi{filter:drop-shadow(0 5px 6px rgba(0,0,0,.38))}#e3d{display:none}#esvg.ph #e3d{display:block}</style>
 <details class="est" id="estd">
 <summary>📏 Pa peshore? Vendos vijën (përafërsisht)</summary>
 <p class="eh" id="qn2" style="display:none;font-size:20px;font-weight:700;color:var(--ink)"></p>
@@ -344,9 +344,9 @@ button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touc
 <linearGradient id="egl" x1="0" x2="1"><stop offset="0" stop-color="#8fb3a5" stop-opacity=".5"/><stop offset=".3" stop-color="#fff" stop-opacity=".22"/><stop offset=".7" stop-color="#cfe3da" stop-opacity=".1"/><stop offset="1" stop-color="#6f9488" stop-opacity=".5"/></linearGradient>
 <linearGradient id="esd" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".35"/><stop offset=".3" stop-color="#fff" stop-opacity=".25"/><stop offset=".62" stop-color="#000" stop-opacity=".05"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></linearGradient>
 <linearGradient id="evg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset="1" stop-color="#000" stop-opacity=".26"/></linearGradient>
-<linearGradient id="ecg" x1="0" x2="1"><stop offset="0" stop-color="#1b1b1b"/><stop offset=".4" stop-color="#585858"/><stop offset="1" stop-color="#111"/></linearGradient></defs>
-<ellipse cx="60" cy="226" rx="34" ry="3.5" fill="#000" opacity=".18"/>
-<g id="epg"><image id="epi" href=""/><g clip-path="url(#ecl)"><rect id="epm" x="0" y="0" width="120" height="0" fill="#fff" fill-opacity=".72"/></g></g>
+<linearGradient id="e3a" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".42"/><stop offset=".12" stop-color="#000" stop-opacity=".16"/><stop offset=".3" stop-color="#000" stop-opacity="0"/><stop offset=".66" stop-color="#000" stop-opacity="0"/><stop offset=".88" stop-color="#000" stop-opacity=".16"/><stop offset="1" stop-color="#000" stop-opacity=".46"/></linearGradient><linearGradient id="e3h" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".42"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><radialGradient id="e3g"><stop offset="0" stop-color="#000" stop-opacity=".42"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient><linearGradient id="ecg" x1="0" x2="1"><stop offset="0" stop-color="#1b1b1b"/><stop offset=".4" stop-color="#585858"/><stop offset="1" stop-color="#111"/></linearGradient></defs>
+<ellipse cx="60" cy="226" rx="34" ry="3.5" fill="#000" opacity=".18"/><ellipse cx="60" cy="225.5" rx="44" ry="5.5" fill="url(#e3g)"/>
+<g id="epg"><image id="epi" href=""/><g clip-path="url(#ecl)"><rect id="epm" x="0" y="0" width="120" height="0" fill="#fff" fill-opacity=".72"/></g><g id="e3d" clip-path="url(#ecl)" pointer-events="none"><rect id="e3r" fill="url(#e3a)" style="mix-blend-mode:multiply"/><rect id="e3s" fill="url(#e3h)" opacity=".55"/><rect id="e3t" fill="url(#e3h)" opacity=".3"/></g></g>
 <path id="eglass" d="" style="fill:#e6f0ec;fill-opacity:.5"/>
 <g class="lq" clip-path="url(#ecl)"><rect id="eliq" x="0" y="224" width="120" height="0"/><rect id="eliq2" x="0" y="224" width="120" height="0" fill="url(#esd)"/><rect id="eliq3" x="0" y="224" width="120" height="0" fill="url(#evg)"/><ellipse id="esurf" cx="60" cy="224" rx="10" ry="2" fill="#fff" fill-opacity=".38" stroke="#fff" stroke-opacity=".5" stroke-width=".6" style="display:none"/>
 <g id="elab"><rect id="elr" rx="2" fill="#f3ead2"/><rect id="elr2" rx="1.5" fill="none" stroke="#6b4a1e" stroke-width=".5"/><text id="elt" text-anchor="middle" font-family="Georgia,serif" font-weight="700" fill="#3b2a12"></text><text id="elv" text-anchor="middle" font-family="Georgia,serif" font-size="5" fill="#6b4a1e"></text></g></g>
@@ -675,9 +675,9 @@ function estShape(){const o=$('type').selectedOptions[0],g=o&&o.parentElement&&o
 let col=GCOL[g]||'#d98a14';for(const r of NCOL){if(r[0].test(nm)){col=r[1];break}}
 let k=GSH[g]&&SHP[GSH[g]]?GSH[g]:'vodka';for(const q in PH){if(new RegExp(PH[q].rx).test(nm)){k=q;break}}return{k:k,sh:SHP[k],col:col}}
 function drawEst(){const s=estShape(),v=+$('vol').value||700;
-const h=Math.round(150+(Math.max(200,Math.min(1000,v))-200)/800*80);$('esvg').setAttribute('height',h);
+const h=Math.round((150+(Math.max(200,Math.min(1000,v))-200)/800*80)*1.5);$('esvg').setAttribute('height',h);
 ['ecp','eglass','eout','eov'].forEach(i=>$(i).setAttribute('d',s.sh.d));$('eliq').style.fill=s.col;
-EK=s.k;EH=s.sh.t;const PI=s.sh.img;$('esvg').classList.toggle('ph',!!PI);if(PI){const e=$('epi');e.setAttribute('href',PI.u);e.setAttribute('x',PI.x);e.setAttribute('y',PI.y);e.setAttribute('width',PI.w);e.setAttribute('height',PI.h);$('elab').style.display='none';placeEst();return}const P=profOf(s.k);let mxw=0;for(let y=0;y<=224;y++)mxw=Math.max(mxw,P.mx[y]-P.mn[y]);
+EK=s.k;EH=s.sh.t;const PI=s.sh.img;$('esvg').classList.toggle('ph',!!PI);if(PI){const e=$('epi');e.setAttribute('href',PI.u);e.setAttribute('x',PI.x);e.setAttribute('y',PI.y);e.setAttribute('width',PI.w);e.setAttribute('height',PI.h);{const q=(id,x,w)=>{const r=$(id);r.setAttribute('x',PI.x+PI.w*x);r.setAttribute('y',PI.y);r.setAttribute('width',PI.w*w);r.setAttribute('height',PI.h)};q('e3r',0,1);q('e3s',.15,.08);q('e3t',.82,.05)}$('elab').style.display='none';placeEst();return}const P=profOf(s.k);let mxw=0;for(let y=0;y<=224;y++)mxw=Math.max(mxw,P.mx[y]-P.mn[y]);
 let yb=0;for(let y=0;y<=224;y++){if(P.mx[y]-P.mn[y]>=mxw*0.97){yb=y;break}}
 const cx=(P.mn[200]+P.mx[200])/2,L1=yb+(224-yb)*0.4,L2=224-(224-yb)*0.12,lw=Math.min(mxw*0.58,52);
 $('elab').style.display=(L2-L1>=26)?'':'none';
