@@ -844,7 +844,27 @@ $('bkup').onclick=async()=>{
 const data={app:'peshorja',v:1,date:new Date().toISOString(),custom:customs.map(c=>Object.assign({},c)),wts:Object.assign({},wts),sizes:Object.assign({},sizes),saved:saved.map(r=>Object.assign({},r))};
 await saveFile('Peshorja_kopja_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(data,null,1));
 bkmsg('Kopja u ruajt me '+customs.length+' pije të shtuara, '+Object.keys(wts).length+' pesha dhe '+saved.length+' shanqe.');
+try{localStorage.setItem('peshorja_lastbk',String(Date.now()))}catch(e){}
+bkRemind();
 };
+function bkRemind(){
+let last=0,snooze=0;try{last=+localStorage.getItem('peshorja_lastbk')||0;snooze=+localStorage.getItem('peshorja_bksnooze')||0}catch(e){}
+let b=document.getElementById('bkrem');
+const has=customs.length||Object.keys(wts).length||saved.length;
+const now=Date.now(),old=last?(now-last)/864e5:999;
+const due=has&&old>=30&&now>snooze;
+if(!due){if(b)b.remove();return}
+if(!b){b=document.createElement('div');b.id='bkrem';b.setAttribute('role','alert');
+b.style.cssText='background:#fff4d6;color:#4a3300;border:1px solid #e0b64a;border-radius:12px;padding:12px 14px;margin:10px 0;font-size:15px;line-height:1.4';
+const t=document.createElement('div');t.id='bkremt';b.appendChild(t);
+const r=document.createElement('div');r.style.cssText='display:flex;gap:8px;margin-top:10px';
+const y=document.createElement('button');y.type='button';y.textContent='Ruaj kopjen tani';y.style.cssText='flex:1;min-height:44px;font-weight:700';y.onclick=()=>{$('bkup').click()};
+const n=document.createElement('button');n.type='button';n.textContent='Më vonë';n.style.cssText='min-height:44px';n.onclick=()=>{try{localStorage.setItem('peshorja_bksnooze',String(Date.now()+864e5))}catch(e){}b.remove()};
+r.appendChild(y);r.appendChild(n);b.appendChild(r);
+const h=document.querySelector('main header');h.parentNode.insertBefore(b,h.nextSibling)}
+b.firstChild.textContent=last?('Kopja e fundit është ruajtur para '+Math.floor(old)+' ditësh. Ruaje një kopje të re që të mos i humbasësh të dhënat.'):'Nuk ke ruajtur asnjëherë kopje. Ruaje një tani që të mos i humbasësh pijet dhe peshat nëse pastrohet telefoni.';
+}
+setTimeout(bkRemind,1500);
 $('bkrest').onclick=()=>{$('bkfile').value='';$('bkfile').click()};
 $('bkfile').onchange=async()=>{
 const f=$('bkfile').files&&$('bkfile').files[0];if(!f)return;
