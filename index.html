@@ -149,6 +149,7 @@ button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touc
 <header>
 <div class="mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M13 3h6v6l3 4v14a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2V13l3-4V3z" stroke="#f3fbf7" stroke-width="2" stroke-linejoin="round"/><path d="M10 19h12v8a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2v-8z" fill="#f3bd52"/></svg></div>
 <div><h1>Peshorja e barit</h1><p>Peshoje shishen dhe shiko sa ka mbetur.</p></div>
+<button type="button" id="thm" aria-label="Ndrysho pamjen" style="margin-left:auto;min-height:40px;min-width:40px;padding:6px 10px;font-size:18px;line-height:1;flex:none"></button>
 </header>
 <div class="tabs" role="tablist"><button type="button" id="tab1" role="tab" aria-selected="true">Peshorja</button><button type="button" id="tab2" role="tab" aria-selected="false">Të ruajturat<b id="cnt">0</b></button></div>
 <div class="tgt" id="tgt" hidden><span id="tgtn"></span><button type="button" id="tgtx">Mbaro</button></div>
@@ -867,6 +868,13 @@ bkmsg('Kopja u ruajt me '+customs.length+' pije të shtuara, '+Object.keys(wts).
 try{localStorage.setItem('peshorja_lastbk',String(Date.now()))}catch(e){}
 bkRemind();
 };
+(function(){const B=document.getElementById('thm');if(!B)return;
+const ico={auto:'🌗',dark:'🌙',light:'☀️'},lab={auto:'Pamja: sipas telefonit',dark:'Pamja: e errët',light:'Pamja: e çelët'};
+function get(){try{return localStorage.getItem('peshorja_theme')||'auto'}catch(e){return 'auto'}}
+function app(m){const r=document.documentElement;if(m==='auto')r.removeAttribute('data-theme');else r.setAttribute('data-theme',m);B.textContent=ico[m];B.setAttribute('aria-label',lab[m]);B.title=lab[m]}
+app(get());
+B.onclick=()=>{const n={auto:'dark',dark:'light',light:'auto'}[get()];try{localStorage.setItem('peshorja_theme',n)}catch(e){}app(n)};
+})();
 function bkRemind(){
 let last=0,snooze=0;try{last=+localStorage.getItem('peshorja_lastbk')||0;snooze=+localStorage.getItem('peshorja_bksnooze')||0}catch(e){}
 let b=document.getElementById('bkrem');
