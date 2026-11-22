@@ -156,7 +156,8 @@ button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touc
 <div class="card" id="qbar" hidden>
 <div class="head"><h2>⚡ Inventar i shpejtë</h2><small id="qcnt" style="color:var(--mute)"></small></div>
 <p style="margin:0 0 4px;font-weight:700;font-size:18px" id="qname"></p>
-<p class="hint" id="qinfo" style="margin:0 0 8px"></p>
+<div id="qprog" style="display:flex;align-items:center;gap:10px;margin:0 0 8px"><svg width="34" height="34" viewBox="0 0 36 36" aria-hidden="true"><circle r="15" cx="18" cy="18" fill="none" stroke="var(--line)" stroke-width="4"/><circle id="qring" r="15" cx="18" cy="18" fill="none" stroke="var(--accent)" stroke-width="4" stroke-linecap="round" stroke-dasharray="0 94.2" transform="rotate(-90 18 18)"/></svg><span id="qprt" style="font-weight:700;font-size:15px;white-space:nowrap"></span><button type="button" id="qord" style="margin-left:auto;min-height:34px;padding:4px 12px;font-size:14px;white-space:nowrap;width:auto"></button></div>
+<p class="hint" id="qinfo" style="margin:0 0 4px"></p><p class="hint" id="qdiff" style="margin:0 0 8px;color:#a8530a"></p>
 <div class="acts"><button type="button" id="qprev">← Mbrapa</button><button type="button" id="qskip">Kapërce</button></div>
 <div class="acts"><button type="button" class="pri" id="qnext">Shto dhe tjetra</button><button type="button" id="qstop">Mbaro</button></div>
 <p class="msg" id="qmsg" role="status"></p>
@@ -355,7 +356,7 @@ button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touc
 <path id="eout" d="" style="fill:none;stroke:#2b3b35;stroke-opacity:.6;stroke-width:1.6;stroke-linejoin:round"/>
 <path id="ehl1" d="" stroke="#fff" stroke-opacity=".75" stroke-width="3" stroke-linecap="round" fill="none"/><path id="ehl2" d="" stroke="#fff" stroke-opacity=".6" stroke-width="2" stroke-linecap="round" fill="none"/>
 <rect id="ecap" rx="2" fill="url(#ecg)"/>
-<path id="ea1" fill="#111" d=""/><path id="ea2" fill="#111" d=""/><line id="eln" x1="-8" x2="128" y1="224" y2="224" stroke="#2f5bff" stroke-width="2.5"/><circle id="edt" cx="126" cy="224" r="6" fill="#2f5bff"/></svg></div>
+<path id="ea1" fill="#111" d=""/><path id="ea2" fill="#111" d=""/><line id="eghost" x1="-8" x2="128" y1="224" y2="224" stroke="#e0720e" stroke-width="2.2" stroke-dasharray="5 4" style="display:none"/><line id="eln" x1="-8" x2="128" y1="224" y2="224" stroke="#2f5bff" stroke-width="2.5"/><circle id="edt" cx="126" cy="224" r="6" fill="#2f5bff"/></svg></div>
 <div class="eq"><button type="button" data-p="0">0</button><button type="button" data-p="25">¼</button><button type="button" data-p="50">½</button><button type="button" data-p="75">¾</button><button type="button" data-p="100">Plot</button></div>
 <p class="eh" id="ep">Niveli: 0%</p>
 </details>
@@ -588,22 +589,41 @@ if(window.XLSX){const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:34},{wc
 else{await saveFile(fileBase(CMPNAME,iso)+'.csv','\ufeff'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(';')).join('\r\n'))}};
 
 window.QON=false;
-function qList(){return [...$('type').options].filter(o=>!/tjetër$/i.test(o.value.split('|')[2]||'')&&!o.disabled&&o.parentElement)}
+function qOrdOn(){try{return localStorage.getItem('peshorja_qord')!=='0'}catch(e){return true}}
+function qList(){const L=[...$('type').options].filter(o=>!/tjetër$/i.test(o.value.split('|')[2]||'')&&!o.disabled&&o.parentElement);
+if(!qOrdOn()||!saved.length||!saved[0].items)return L;
+const m=new Map();saved[0].items.forEach((x,i)=>{if(!m.has(x.t))m.set(x.t,i)});if(!m.size)return L;
+return L.map((o,i)=>[o,m.has(o.value)?m.get(o.value):1e6+i]).sort((a,b)=>a[1]-b[1]).map(a=>a[0])}
+function qPrev(){const t=$('type').value,v=$('vol').value;let f=null;for(const r of saved){const its=r.items||[];const it=its.find(x=>x.t===t&&x.v===v)||its.find(x=>x.t===t);if(it){f={it:it,r:r};break}}return f}
+function qGhost(){const g=$('eghost'),d=$('qdiff');if(!g||!d)return;
+if(!window.QON){g.style.display='none';return}
+const p=qPrev();if(!p||!(+p.it.pct>=0)){g.style.display='none';d.textContent='Para: nuk ka të dhëna për këtë pije.';return}
+const pc=Math.round(+p.it.pct);let y=224;try{y=yOf(EK,pc)}catch(e){}
+g.setAttribute('y1',y);g.setAttribute('y2',y);g.style.display='';
+const dt=new Date(p.r.date),ds=('0'+dt.getDate()).slice(-2)+'.'+('0'+(dt.getMonth()+1)).slice(-2);
+let t='Para ('+ds+'): '+pc+'% · '+L2(p.it.ml)+' L, vija portokalli';
+if(EST){const df=EP-pc;t+=' · tani '+EP+'% ('+(df>0?'+':'')+df+'%)'}
+d.textContent=t}
+function qProg(){const L=qList(),n=L.filter(o=>items.some(it=>it.t===o.value)).length;
+$('qprt').textContent='Numëruar '+n+' nga '+L.length;
+$('qring').setAttribute('stroke-dasharray',(94.2*(L.length?n/L.length:0)).toFixed(1)+' 94.2')}
+function qOrdTxt(){$('qord').textContent=qOrdOn()?'↕ Si më parë':'↕ Sipas listës'}
 function qIdx(){return qList().indexOf($('type').selectedOptions[0])}
 function qShow(){const L=qList(),i=qIdx(),o=$('type').selectedOptions[0];if(!o)return;
 $('qcnt').textContent='Pija '+(i+1)+' / '+L.length;$('qname').textContent=o.value.split('|')[2];$('qn2').textContent=o.value.split('|')[2]+' · '+(i+1)+'/'+L.length;$('qn2').style.display='block';
 const inl=items.some(it=>it.t===$('type').value&&it.v===$('vol').value);
-$('qinfo').textContent=(o.parentElement.label||'')+(inl?' · ✓ tashmë në listë':'');$('qmsg').textContent=''}
+$('qinfo').textContent=(o.parentElement.label||'')+(inl?' · ✓ tashmë në listë':'');$('qmsg').textContent='';qProg();qOrdTxt();qGhost()}
 function qGo(i){const L=qList();if(i<0)i=0;if(i>=L.length){$('qmsg').textContent='Kalove gjithë listën. Shtyp "Mbaro", pastaj "Ruaj" poshtë listës.';return}
 $('type').selectedIndex=[...$('type').options].indexOf(L[i]);$('cur').value='';estReset();pick();$('estd').open=true;qShow();document.body.classList.add('qon');fitQ();scrollTo(0,Math.max(0,$('qbar').getBoundingClientRect().top+scrollY-6));setTimeout(()=>{fitQ();scrollTo(0,Math.max(0,$('qbar').getBoundingClientRect().top+scrollY-6))},120)}
 var EORIG={p:$('estd').parentNode,n:$('estd').nextSibling};
 function fitQ(){if(!window.QON)return;const sv=$('esvg'),q=$('qbar');sv.setAttribute('height',100);sv.style.width=(100*120/230)+'px';const c=$('qstop').parentNode.getBoundingClientRect().bottom-q.getBoundingClientRect().top-sv.getBoundingClientRect().height;const H=Math.max(170,Math.min(640,Math.round(innerHeight-c-20)));window.QH=H;sv.setAttribute('height',H);sv.style.width=(H*120/230)+'px';placeEst()}
 window.addEventListener('resize',fitQ);
 $('qbtn').onclick=()=>{window.QON=true;$('qbar').hidden=false;$('qbar').insertBefore($('estd'),$('qprev').parentNode);qGo(0)};
+$('qord').onclick=()=>{try{localStorage.setItem('peshorja_qord',qOrdOn()?'0':'1')}catch(e){}qShow()};
 $('qprev').onclick=()=>qGo(qIdx()-1);
 $('qskip').onclick=()=>qGo(qIdx()+1);
 $('qnext').onclick=()=>{calc();if(!cur){$('qmsg').textContent='Vendos vijën ose shkruaj peshën, ose shtyp Kapërce.';return}const i=qIdx();$('add').click();qGo(i+1)};
-$('qstop').onclick=()=>{window.QON=false;document.body.classList.remove('qon');$('esvg').style.width='';$('qbar').hidden=true;$('qmsg').textContent='';$('qn2').style.display='none';EORIG.p.insertBefore($('estd'),EORIG.n)};
+$('qstop').onclick=()=>{window.QON=false;qGhost();document.body.classList.remove('qon');$('esvg').style.width='';$('qbar').hidden=true;$('qmsg').textContent='';$('qn2').style.display='none';EORIG.p.insertBefore($('estd'),EORIG.n)};
 $('cpall').onclick=()=>copyText(txtAll());
 $('xlall').onclick=()=>exportAll();
 $('copy').onclick=()=>copyText(txtOf($('sname').value.trim()||'Bar1',new Date().toISOString(),items));
@@ -699,9 +719,9 @@ if(SHP[EK]&&SHP[EK].img){$('epm').setAttribute('height',Math.max(0,y))}$('elm1')
 const P=profOf(EK),yi=Math.max(0,Math.min(224,Math.round(y))),rx=(P.mx[yi]-P.mn[yi])/2-1,se=$('esurf');
 se.setAttribute('cx',(P.mn[yi]+P.mx[yi])/2);se.setAttribute('cy',y);se.setAttribute('rx',Math.max(1,rx));se.setAttribute('ry',Math.max(1.5,rx*0.13));se.style.display=EP>0?'':'none';
 $('ep').textContent='Niveli: '+EP+'%'}
-function setEst(p){EP=Math.max(0,Math.min(100,Math.round(p)));placeEst();
+function setEst(p){EP=Math.max(0,Math.min(100,Math.round(p)));placeEst();setTimeout(qGhost,0);
 const o=efOf();if(!(o.f>o.e))return;$('cur').value=Math.round(o.e+EP/100*(o.f-o.e));EST=true;calc();if(cur)$('ep').textContent='Niveli: '+EP+'% · '+L2(cur.ml)+' L · '+cur.doses+' doza'}
-function estReset(){EST=false;EP=0;drawEst()}
+function estReset(){EST=false;EP=0;drawEst();try{qGhost()}catch(e){}}
 (function(){const eb=$('eb');let dr=false;
 function at(ev){const r=$('esvg').getBoundingClientRect(),k=r.height/230,bot=r.top+224*k,top=r.top+EH*k;const y=Math.max(top,Math.min(bot,ev.clientY));let p=pOf(EK,(y-r.top)/k);if(p<4)p=0;else if(p>97)p=100;setEst(p)}
 eb.addEventListener('pointerdown',ev=>{dr=true;try{eb.setPointerCapture(ev.pointerId)}catch(e){}at(ev);ev.preventDefault()});
