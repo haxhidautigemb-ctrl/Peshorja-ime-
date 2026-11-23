@@ -160,7 +160,7 @@ button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touc
 <div id="qprog" style="display:flex;align-items:center;gap:10px;margin:0 0 8px"><svg width="34" height="34" viewBox="0 0 36 36" aria-hidden="true"><circle r="15" cx="18" cy="18" fill="none" stroke="var(--line)" stroke-width="4"/><circle id="qring" r="15" cx="18" cy="18" fill="none" stroke="var(--accent)" stroke-width="4" stroke-linecap="round" stroke-dasharray="0 94.2" transform="rotate(-90 18 18)"/></svg><span id="qprt" style="font-weight:700;font-size:15px;white-space:nowrap"></span><button type="button" id="qord" style="margin-left:auto;min-height:34px;padding:4px 12px;font-size:14px;white-space:nowrap;width:auto"></button></div>
 <p class="hint" id="qinfo" style="margin:0 0 4px"></p><p class="hint" id="qdiff" style="margin:0 0 8px;color:#a8530a"></p>
 <div class="acts"><button type="button" id="qprev">← Mbrapa</button><button type="button" id="qskip">Kapërce</button></div>
-<div id="qfbox" style="display:flex;gap:8px;align-items:center;margin-top:10px"><label style="flex:none;margin:0;font-size:14px;display:flex;align-items:center;gap:6px">Shishe të plota<input id="qfulln" type="number" inputmode="numeric" min="1" max="24" value="1" style="width:64px;margin:0;min-height:44px;text-align:center"></label><button type="button" id="qaddfull" style="flex:1;min-height:44px;font-weight:700">＋ Shto</button></div>
+<div id="qfbox" style="display:flex;gap:8px;align-items:center;margin-top:10px"><label style="flex:none;margin:0;font-size:14px;display:flex;align-items:center;gap:6px">Shishe të plota<input id="qfulln" type="number" inputmode="numeric" min="1" max="24" value="1" style="width:64px;margin:0;min-height:44px;text-align:center"></label><button type="button" id="qaddfull" style="flex:1;min-height:44px;font-weight:700">＋ Shto</button></div><div id="qfmsg" role="status" style="display:none;position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);left:12px;right:12px;z-index:60;box-shadow:0 8px 24px rgba(0,0,0,.4);padding:10px 12px;border-radius:10px;background:#d9f2e3;color:#0b4a2a;font-weight:700;font-size:15px;align-items:center;justify-content:space-between;gap:10px"></div>
 <div class="acts"><button type="button" class="pri" id="qnext">Shto dhe tjetra</button><button type="button" id="qstop">Mbaro</button></div>
 <p class="msg" id="qmsg" role="status"></p>
 </div>
@@ -377,7 +377,7 @@ button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touc
 </div>
 <p class="note" id="note"></p>
 <button class="pri" id="add" type="button">Shto në listë</button>
-<div id="mfbox" style="display:flex;gap:8px;align-items:center;margin-top:10px"><label style="flex:none;margin:0;font-size:14px;display:flex;align-items:center;gap:6px">Shishe të plota<input id="mfulln" type="number" inputmode="numeric" min="1" max="24" value="1" style="width:64px;margin:0;min-height:44px;text-align:center"></label><button type="button" id="maddfull" style="flex:1;min-height:44px;font-weight:700">＋ Shto</button></div>
+<div id="mfbox" style="display:flex;gap:8px;align-items:center;margin-top:10px"><label style="flex:none;margin:0;font-size:14px;display:flex;align-items:center;gap:6px">Shishe të plota<input id="mfulln" type="number" inputmode="numeric" min="1" max="24" value="1" style="width:64px;margin:0;min-height:44px;text-align:center"></label><button type="button" id="maddfull" style="flex:1;min-height:44px;font-weight:700">＋ Shto</button></div><div id="mfmsg" role="status" style="display:none;position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);left:12px;right:12px;z-index:60;box-shadow:0 8px 24px rgba(0,0,0,.4);padding:10px 12px;border-radius:10px;background:#d9f2e3;color:#0b4a2a;font-weight:700;font-size:15px;align-items:center;justify-content:space-between;gap:10px"></div>
 </section>
 
 <section class="card vm" id="listcard">
@@ -595,17 +595,28 @@ R.insertBefore(bx,R.firstChild)}
 CMPWA=lines[0]+'\n\n'+(top.length?'🏆 Top 5 më të konsumuarat:\n'+top.map((x,i)=>(i+1)+'. '+x.n+': '+L2(x.c)+' L ('+x.ds+' doza)').join('\n')+'\n\n':'')+lines.slice(1).join('\n');
 CMPROWS=rows;CMPTXT=lines.join('\n');CMPNAME='Konsumi_'+ra.name+'_'+rb.name;$('cmpacts').hidden=false}
 
-function addFull(src){const inp=$(src+'fulln'),n=parseInt(inp.value,10);
-const say2=t=>{if(src==='q')$('qmsg').textContent=t;else say(t)};
-if(!(n>=1&&n<=24))return say2('Shkruaj sa shishe të plota: nga 1 deri në 24.');
-if(typeof edit!=='undefined'&&edit)return say2('Mbaro ndryshimin e shishes së hapur së pari.');
+var FB=0;
+function fmHide(m){clearTimeout(m._t);m._t=setTimeout(()=>{m.style.display='none'},6000)}
+function fmsgShow(src,txt,bid){const m=$(src+'fmsg');fmHide(m);m.textContent='';m.style.display='flex';m.style.background='#d9f2e3';m.style.color='#0b4a2a';
+const t=document.createElement('span');t.textContent=txt;m.appendChild(t);
+if(bid){const u=document.createElement('button');u.type='button';u.textContent='↩ Anulo';u.style.cssText='min-height:40px;flex:none;font-weight:700';u.onclick=()=>{undoFull(src,bid)};m.appendChild(u)}}
+function undoFull(src,bid){let k=0;const cut=a=>{for(let i=a.length-1;i>=0;i--)if(a[i].b===bid){a.splice(i,1);k++}};
+if(target){cut(target.items);saveLocalSaved();if(COL)COL.doc(target.id).set(target).catch(()=>{});renderSaved()}else{cut(items);save();render()}
+const m=$(src+'fmsg');fmHide(m);m.textContent='';m.style.display='flex';m.style.background='#fde8c8';m.style.color='#5a3500';
+const t=document.createElement('span');t.textContent='↩ U anuluan '+k+' shishe.';m.appendChild(t);if(src==='q')qShow()}
+function addFull(src){const inp=$(src+'fulln'),btn=$(src+'addfull'),n=parseInt(inp.value,10);
+const warn=t=>{const m=$(src+'fmsg');fmHide(m);m.textContent=t;m.style.display='flex';m.style.background='#fde0e0';m.style.color='#7a1010'};
+if(!(n>=1&&n<=24))return warn('Shkruaj sa shishe të plota: nga 1 deri në 24.');
+if(edit)return warn('Mbaro ndryshimin e shishes së hapur së pari.');
+if(btn.dataset.lock)return;btn.dataset.lock='1';const old=btn.textContent;btn.textContent='✓ U shtua';setTimeout(()=>{delete btn.dataset.lock;btn.textContent=old},350);
 const v=+$('vol').value,d=+$('dose').value||40;let g=0;try{g=Math.round(efOf().f)}catch(e){}
-const nm=$('type').value.split('|')[2]+' '+($('vol').selectedOptions[0].text);
-const mk=()=>({name:nm,ml:v,pct:100,doses:Math.round(v/d*10)/10,t:$('type').value,v:$('vol').value,g:g,full:true});
-if(target){for(let i=0;i<n;i++)target.items.push(mk());saveLocalSaved();if(COL)COL.doc(target.id).set(target).catch(()=>{});renderSaved();$('tgtn').textContent='✓ U shtuan '+n+' shishe te '+target.name;return}
-for(let i=0;i<n;i++)items.push(mk());save();render();
+const nm=$('type').value.split('|')[2]+' '+($('vol').selectedOptions[0].text);const bid=++FB+'_'+Date.now();
+const mk=()=>({name:nm,ml:v,pct:100,doses:Math.round(v/d*10)/10,t:$('type').value,v:$('vol').value,g:g,full:true,b:bid});
+const arr=target?target.items:items;for(let i=0;i<n;i++)arr.push(mk());
+const have=arr.filter(x=>x.full&&x.name===nm).length;
+if(target){saveLocalSaved();if(COL)COL.doc(target.id).set(target).catch(()=>{});renderSaved()}else{save();render()}
 inp.value=1;if(src==='q')qShow();
-say2('✓ U shtuan '+n+' shishe të plota ('+L2(v*n)+' L). Tani mat shishet e hapura.')}
+fmsgShow(src,'✓ +'+n+' shishe ('+L2(v*n)+' L) · gjithsej të plota: '+have,bid)}
 $('maddfull').onclick=()=>addFull('m');$('qaddfull').onclick=()=>addFull('q');
 var CMPWA='';
 function toWA(t){const u='https://wa.me/?text='+encodeURIComponent(t);const w=window.open(u,'_blank');if(!w)location.href=u}
@@ -643,7 +654,7 @@ function qShow(){const L=qList(),i=qIdx(),o=$('type').selectedOptions[0];if(!o)r
 $('qcnt').textContent='Pija '+(i+1)+' / '+L.length;$('qname').textContent=o.value.split('|')[2];$('qn2').textContent=o.value.split('|')[2]+' · '+(i+1)+'/'+L.length;$('qn2').style.display='block';
 const inl=items.some(it=>it.t===$('type').value&&it.v===$('vol').value);
 $('qinfo').textContent=(o.parentElement.label||'')+(inl?' · ✓ tashmë në listë':'');$('qmsg').textContent='';qProg();qOrdTxt();qGhost()}
-function qGo(i){const L=qList();if(i<0)i=0;if(i>=L.length){$('qmsg').textContent='Kalove gjithë listën. Shtyp "Mbaro", pastaj "Ruaj" poshtë listës.';return}
+function qGo(i){const L=qList();{const m=$('qfmsg');if(m)m.style.display='none'}if(i<0)i=0;if(i>=L.length){$('qmsg').textContent='Kalove gjithë listën. Shtyp "Mbaro", pastaj "Ruaj" poshtë listës.';return}
 $('type').selectedIndex=[...$('type').options].indexOf(L[i]);$('cur').value='';estReset();pick();$('estd').open=true;qShow();document.body.classList.add('qon');fitQ();scrollTo(0,Math.max(0,$('qbar').getBoundingClientRect().top+scrollY-6));setTimeout(()=>{fitQ();scrollTo(0,Math.max(0,$('qbar').getBoundingClientRect().top+scrollY-6))},120)}
 var EORIG={p:$('estd').parentNode,n:$('estd').nextSibling};
 function fitQ(){if(!window.QON)return;const sv=$('esvg'),q=$('qbar');sv.setAttribute('height',100);sv.style.width=(100*120/230)+'px';const c=$('qstop').parentNode.getBoundingClientRect().bottom-q.getBoundingClientRect().top-sv.getBoundingClientRect().height;const H=Math.max(170,Math.min(640,Math.round(innerHeight-c-20)));window.QH=H;sv.setAttribute('height',H);sv.style.width=(H*120/230)+'px';placeEst()}
@@ -701,7 +712,7 @@ if(!items.length)$('cp').hidden=true;
 function pick(){const q=$('type').value.split('|');$('vol').value=sizes[q[2]]||q[3];loadW();calc();if(typeof drawEst==='function')drawEst()}
 $('vol').addEventListener('change',()=>{const q=$('type').value.split('|');sizes[q[2]]=$('vol').value;try{localStorage.setItem('imebar_sizes',JSON.stringify(sizes))}catch(e){}touched=true;sync();loadW();calc()});
 ['full','empty'].forEach(i=>$(i).addEventListener('input',saveW));
-$('type').addEventListener('change',()=>{$('cur').value='';estReset();pick()});
+$('type').addEventListener('change',()=>{['q','m'].forEach(p=>{const m=$(p+'fmsg');if(m)m.style.display='none'});$('cur').value='';estReset();pick()});
 function efOf(){const v=+$('vol').value,fR=$('full').value.trim(),eR=$('empty').value.trim();let dens=+$('type').value.split('|')[0],e,f;
 if(fR!==''&&eR!==''){f=+fR;e=+eR}else if(fR!==''){f=+fR;e=f-v*dens}else if(eR!==''){e=+eR;f=e+v*dens}else{e=GLASS[v]||480;f=e+v*dens}
 return{e:e,f:f}}
