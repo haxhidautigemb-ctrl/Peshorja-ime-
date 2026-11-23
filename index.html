@@ -401,7 +401,7 @@ button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touc
 <p class="hint">Çdo shank i ruajtur mbetet këtu me datën e tij.</p>
 <div id="saved"></div>
 <div class="acts" id="allacts" hidden>
-<button id="cpall" type="button">Kopjo të gjitha</button>
+<button id="cpall" type="button">Kopjo të gjitha</button> <button id="wall" type="button">WhatsApp</button>
 <button id="xlall" type="button">Excel të gjitha</button>
 </div>
 <div class="savebox" id="cmpbox" hidden>
@@ -411,7 +411,7 @@ button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touc
 <label for="cmpb" style="margin-top:8px">Pas (më i riu)<select id="cmpb"></select></label>
 <button type="button" class="pri" id="cmpgo" style="margin-top:12px">Llogarit konsumin</button>
 <div id="cmpres" style="margin-top:10px"></div>
-<div class="acts" id="cmpacts" hidden><button id="cmpcp" type="button">Kopjo</button><button id="cmpxl" type="button">Excel</button></div>
+<div class="acts" id="cmpacts" hidden><button id="cmpwa" type="button">WhatsApp</button><button id="cmpcp" type="button">Kopjo</button><button id="cmpxl" type="button">Excel</button></div>
 </div>
 <div class="savebox" style="margin-top:18px">
 <h2 style="margin-bottom:6px">Kopja rezervë</h2>
@@ -567,12 +567,12 @@ if(!ra||!rb)return msg('Zgjidh dy inventarë.');
 if(ra.id===rb.id)return msg('Zgjidh dy inventarë të ndryshëm.');
 const A={},Bm={};aggregate([ra]).forEach(e=>{A[e.name]=e.ml});aggregate([rb]).forEach(e=>{Bm[e.name]=e.ml});
 const names=Object.keys(Object.assign({},A,Bm)).sort((x,y)=>x.localeCompare(y));
-const rows=[['Pija','Para (L)','Pas (L)','Konsumuar (L)','Konsumuar (ml)','Doza (4 cl)']];let tot=0,td=0,up=0,solo=0;
+const rows=[['Pija','Para (L)','Pas (L)','Konsumuar (L)','Konsumuar (ml)','Doza (4 cl)']];let tot=0,td=0,up=0,solo=0;const cons=[];
 const lines=['Konsumi: '+ra.name+' ('+dstr(ra.date)+') → '+rb.name+' ('+dstr(rb.date)+')'];
 names.forEach(n=>{const a=A[n],b=Bm[n],d=document.createElement('div');d.className='di';const s=document.createElement('span'),v=document.createElement('b');
 if(a!==undefined&&b!==undefined){const c=a-b,ds=Math.round(c/40*10)/10;
 s.textContent=n+' · '+L2(a)+' → '+L2(b)+' L';
-if(c>=0){v.textContent=L2(c)+' L · '+ds+' doza';tot+=c;td+=ds;rows.push([n,+L2(a),+L2(b),+L2(c),c,ds]);lines.push(n+': '+L2(c)+' L ('+ds+' doza)')}
+if(c>=0){v.textContent=L2(c)+' L · '+ds+' doza';tot+=c;td+=ds;if(c>0)cons.push({n:n,c:c,ds:ds});rows.push([n,+L2(a),+L2(b),+L2(c),c,ds]);lines.push(n+': '+L2(c)+' L ('+ds+' doza)')}
 else{v.textContent='+'+L2(-c)+' L shtuar';up++;rows.push([n,+L2(a),+L2(b),'shtuar',c,'']);lines.push(n+': shtuar +'+L2(-c)+' L')}}
 else{solo++;s.textContent=n+(a!==undefined?' · vetëm te "Para"':' · vetëm te "Pas"');v.textContent='nuk krahasohet';rows.push([n,a!==undefined?+L2(a):'',b!==undefined?+L2(b):'','nuk krahasohet','','']);lines.push(n+': nuk krahasohet')}
 d.append(s,v);R.appendChild(d)});
@@ -581,7 +581,21 @@ const t=document.createElement('div');t.className='di tt';const ta=document.crea
 rows.push(['Konsumi gjithsej','','',+L2(tot),tot,td]);lines.push('Konsumi gjithsej: '+L2(tot)+' L · '+td+' doza');
 if(up)msg(up+' pije kanë më shumë se më parë (u shtuan ose u plotësuan), prandaj nuk numërohen si konsum.');
 if(solo)msg(solo+' pije janë vetëm në njërin inventar, prandaj nuk krahasohen.');
+const top=cons.sort((x,y)=>y.c-x.c).slice(0,5);
+if(top.length){const bx=document.createElement('div');bx.style.cssText='margin:0 0 14px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface)';
+const h=document.createElement('div');h.textContent='🏆 Top 5 pijet më të konsumuara';h.style.cssText='font-weight:700;margin-bottom:10px';bx.appendChild(h);
+top.forEach((x,i)=>{const w=document.createElement('div');w.style.cssText='margin-bottom:9px';
+const r=document.createElement('div');r.style.cssText='display:flex;justify-content:space-between;gap:8px;font-size:14px;margin-bottom:3px';
+const a=document.createElement('span');a.textContent=(i+1)+'. '+x.n;const b=document.createElement('b');b.textContent=L2(x.c)+' L · '+x.ds+' doza';b.style.whiteSpace='nowrap';r.append(a,b);
+const tr=document.createElement('div');tr.style.cssText='height:10px;border-radius:6px;background:var(--tint);overflow:hidden';
+const fl=document.createElement('div');fl.style.cssText='height:100%;border-radius:6px;background:var(--accent);width:'+Math.max(3,Math.round(x.c/top[0].c*100))+'%';tr.appendChild(fl);w.append(r,tr);bx.appendChild(w)});
+R.insertBefore(bx,R.firstChild)}
+CMPWA=lines[0]+'\n\n'+(top.length?'🏆 Top 5 më të konsumuarat:\n'+top.map((x,i)=>(i+1)+'. '+x.n+': '+L2(x.c)+' L ('+x.ds+' doza)').join('\n')+'\n\n':'')+lines.slice(1).join('\n');
 CMPROWS=rows;CMPTXT=lines.join('\n');CMPNAME='Konsumi_'+ra.name+'_'+rb.name;$('cmpacts').hidden=false}
+var CMPWA='';
+function toWA(t){const u='https://wa.me/?text='+encodeURIComponent(t);const w=window.open(u,'_blank');if(!w)location.href=u}
+$('cmpwa').onclick=()=>{if(CMPWA)toWA(CMPWA)};
+$('wall').onclick=()=>toWA(txtAll());
 $('cmpgo').onclick=calcCmp;
 $('cmpa').onchange=$('cmpb').onchange=()=>{$('cmpres').textContent='';$('cmpacts').hidden=true};
 $('cmpcp').onclick=()=>{if(CMPTXT)copyText(CMPTXT)};
