@@ -160,7 +160,7 @@ button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touc
 <div id="qprog" style="display:flex;align-items:center;gap:10px;margin:0 0 8px"><svg width="34" height="34" viewBox="0 0 36 36" aria-hidden="true"><circle r="15" cx="18" cy="18" fill="none" stroke="var(--line)" stroke-width="4"/><circle id="qring" r="15" cx="18" cy="18" fill="none" stroke="var(--accent)" stroke-width="4" stroke-linecap="round" stroke-dasharray="0 94.2" transform="rotate(-90 18 18)"/></svg><span id="qprt" style="font-weight:700;font-size:15px;white-space:nowrap"></span><button type="button" id="qord" style="margin-left:auto;min-height:34px;padding:4px 12px;font-size:14px;white-space:nowrap;width:auto"></button></div>
 <p class="hint" id="qinfo" style="margin:0 0 4px"></p><p class="hint" id="qdiff" style="margin:0 0 8px;color:#a8530a"></p>
 <div class="acts"><button type="button" id="qprev">← Mbrapa</button><button type="button" id="qskip">Kapërce</button></div>
-<div id="qfbox" style="display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:10px;padding:8px 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface)"><span style="font-size:14px;font-weight:600;line-height:1.2">Shishe të plota<br><small style="font-weight:400;color:var(--mute)">të mbyllura</small></span><span style="display:flex;align-items:center;gap:6px"><button type="button" id="qfminus" aria-label="Hiq një shishe të plotë" style="width:52px;min-height:48px;font-size:26px;line-height:1;padding:0;flex:none">−</button><b id="qfcnt" style="min-width:38px;text-align:center;font-size:24px">0</b><button type="button" id="qfplus" aria-label="Shto një shishe të plotë" style="width:52px;min-height:48px;font-size:26px;line-height:1;padding:0;flex:none;font-weight:700">+</button></span></div>
+<div id="qfbox" style="display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:6px;padding:4px 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface)"><span style="font-size:14px;font-weight:600;line-height:1.2">Shishe të plota<br><small style="font-weight:400;color:var(--mute)">të mbyllura</small></span><span style="display:flex;align-items:center;gap:6px"><button type="button" id="qfminus" aria-label="Hiq një shishe të plotë" style="width:52px;min-height:44px;font-size:26px;line-height:1;padding:0;flex:none">−</button><b id="qfcnt" style="min-width:38px;text-align:center;font-size:24px">0</b><button type="button" id="qfplus" aria-label="Shto një shishe të plotë" style="width:52px;min-height:44px;font-size:26px;line-height:1;padding:0;flex:none;font-weight:700">+</button></span></div>
 <div class="acts"><button type="button" class="pri" id="qnext">Shto dhe tjetra</button><button type="button" id="qstop">Mbaro</button></div>
 <p class="msg" id="qmsg" role="status"></p>
 </div>
@@ -377,7 +377,7 @@ button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touc
 </div>
 <p class="note" id="note"></p>
 <button class="pri" id="add" type="button">Shto në listë</button>
-<div id="mfbox" style="display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:10px;padding:8px 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface)"><span style="font-size:14px;font-weight:600;line-height:1.2">Shishe të plota<br><small style="font-weight:400;color:var(--mute)">të mbyllura</small></span><span style="display:flex;align-items:center;gap:6px"><button type="button" id="mfminus" aria-label="Hiq një shishe të plotë" style="width:52px;min-height:48px;font-size:26px;line-height:1;padding:0;flex:none">−</button><b id="mfcnt" style="min-width:38px;text-align:center;font-size:24px">0</b><button type="button" id="mfplus" aria-label="Shto një shishe të plotë" style="width:52px;min-height:48px;font-size:26px;line-height:1;padding:0;flex:none;font-weight:700">+</button></span></div>
+<div id="mfbox" style="display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:6px;padding:4px 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface)"><span style="font-size:14px;font-weight:600;line-height:1.2">Shishe të plota<br><small style="font-weight:400;color:var(--mute)">të mbyllura</small></span><span style="display:flex;align-items:center;gap:6px"><button type="button" id="mfminus" aria-label="Hiq një shishe të plotë" style="width:52px;min-height:44px;font-size:26px;line-height:1;padding:0;flex:none">−</button><b id="mfcnt" style="min-width:38px;text-align:center;font-size:24px">0</b><button type="button" id="mfplus" aria-label="Shto një shishe të plotë" style="width:52px;min-height:44px;font-size:26px;line-height:1;padding:0;flex:none;font-weight:700">+</button></span></div>
 </section>
 
 <section class="card vm" id="listcard">
@@ -468,7 +468,7 @@ function pad(n){return String(n).padStart(2,'0')}
 function dstr(iso){const d=new Date(iso);return pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear()}
 function L2(ml){return (ml/1000).toFixed(2)}
 function sums(list){let ml=0,ds=0;list.forEach(x=>{ml+=x.ml;ds+=x.doses});return{ml:ml,ds:Math.round(ds*10)/10}}
-function txtOf(name,iso,list){const t=sums(list);return ['Inventari '+name+' · '+dstr(iso)].concat(list.map(x=>(x.est?'≈ ':'')+x.name+': '+L2(x.ml)+' L ('+x.pct+'%) · '+x.doses+' doza')).concat(['Totali: '+L2(t.ml)+' L · '+t.ds+' doza']).join('\n')}
+function txtOf(name,iso,list){const t=sums(list);const gm=gmap(list);const lines=[];list.forEach(x=>{const g=gm[x.name];if(g){if(!g.done){g.done=true;lines.push(x.name+': '+L2(g.ml)+' L ('+gnote(g)+') · '+Math.round(g.ds*10)/10+' doza')}return}lines.push((x.est?'≈ ':'')+x.name+': '+L2(x.ml)+' L ('+x.pct+'%) · '+x.doses+' doza')});return ['Inventari '+name+' · '+dstr(iso)].concat(lines).concat(['Totali: '+L2(t.ml)+' L · '+t.ds+' doza']).join('\n')}
 function say(t){const m=$('msg');m.textContent=t;clearTimeout(say.t);say.t=setTimeout(()=>{m.textContent=''},6000)}
 async function copyText(t){
 try{await navigator.clipboard.writeText(t);$('cp').hidden=true;say('U kopjua. Ngjite në Notes ose në email.');return}catch(e){}
@@ -545,7 +545,12 @@ const bt=document.createElement('div');bt.className='btns';
 const mk=(label)=>{const b=document.createElement('button');b.type='button';b.textContent=label;bt.appendChild(b);return b};
 const bp=mk('Shto pije'),bo=mk('Hap'),bc=mk('Kopjo'),bx=mk('Excel'),bd=mk('Fshi');
 const dt=document.createElement('div');dt.className='det';dt.hidden=true;
-r.items.forEach((x,xi)=>{const d=document.createElement('div');d.className='di';const a1=document.createElement('span');a1.textContent=(x.est?'≈ ':'')+x.name;const b1=document.createElement('b');b1.textContent=(x.ml/1000).toFixed(2)+' L · '+x.pct+'%';const be=document.createElement('button');be.type='button';be.textContent='Ndrysho';be.style.cssText='margin:0 0 0 8px;width:auto;padding:4px 10px;font-size:13px';be.onclick=()=>startEdit(r.items,xi,r);d.append(a1,b1,be);dt.appendChild(d)});
+{const gm2=gmap(r.items);r.items.forEach((x,xi)=>{const g=gm2[x.name];
+if(g){if(!g.done){g.done=true;const d=document.createElement('div');d.className='di';const a1=document.createElement('span');a1.textContent=x.name+' · '+gnote(g);const b1=document.createElement('b');b1.textContent=(g.ml/1000).toFixed(2)+' L';d.append(a1,b1);
+if(g.o===1){const oi=r.items.findIndex(y=>y.name===x.name&&!y.full);const be=document.createElement('button');be.type='button';be.textContent='Ndrysho';be.style.cssText='margin:0 0 0 8px;width:auto;padding:4px 10px;font-size:13px';be.onclick=()=>startEdit(r.items,oi,r);d.appendChild(be)}
+dt.appendChild(d)}
+if(x.full||g.o===1)return}
+const d=document.createElement('div');d.className='di';if(g)d.style.paddingLeft='14px';const a1=document.createElement('span');a1.textContent=(g?'↳ e hapur':(x.est?'≈ ':'')+x.name);const b1=document.createElement('b');b1.textContent=(x.ml/1000).toFixed(2)+' L · '+x.pct+'%';const be=document.createElement('button');be.type='button';be.textContent='Ndrysho';be.style.cssText='margin:0 0 0 8px;width:auto;padding:4px 10px;font-size:13px';be.onclick=()=>startEdit(r.items,xi,r);d.append(a1,b1,be);dt.appendChild(d)})}
 const tt=document.createElement('div');tt.className='di tt';const ta=document.createElement('span');ta.textContent='Totali';const tb=document.createElement('b');tb.textContent=L2(t.ml)+' L';tt.append(ta,tb);dt.appendChild(tt);
 bp.onclick=()=>{target=r;$('tgtn').textContent='Po shton te '+r.name+' ('+r.items.length+' shishe)';setView(1)};
 bo.onclick=()=>{dt.hidden=!dt.hidden;bo.textContent=dt.hidden?'Hap':'Mbyll'};
@@ -645,7 +650,7 @@ $('qinfo').textContent=(o.parentElement.label||'')+(inl?' · ✓ tashmë në lis
 function qGo(i){const L=qList();if(i<0)i=0;if(i>=L.length){$('qmsg').textContent='Kalove gjithë listën. Shtyp "Mbaro", pastaj "Ruaj" poshtë listës.';return}
 $('type').selectedIndex=[...$('type').options].indexOf(L[i]);$('cur').value='';estReset();pick();$('estd').open=true;qShow();document.body.classList.add('qon');fitQ();scrollTo(0,Math.max(0,$('qbar').getBoundingClientRect().top+scrollY-6));setTimeout(()=>{fitQ();scrollTo(0,Math.max(0,$('qbar').getBoundingClientRect().top+scrollY-6))},120)}
 var EORIG={p:$('estd').parentNode,n:$('estd').nextSibling};
-function fitQ(){if(!window.QON)return;const sv=$('esvg'),q=$('qbar');sv.setAttribute('height',100);sv.style.width=(100*120/230)+'px';const c=$('qstop').parentNode.getBoundingClientRect().bottom-q.getBoundingClientRect().top-sv.getBoundingClientRect().height;const H=Math.max(170,Math.min(640,Math.round(innerHeight-c-20)));window.QH=H;sv.setAttribute('height',H);sv.style.width=(H*120/230)+'px';placeEst()}
+function fitQ(){if(!window.QON)return;const sv=$('esvg'),q=$('qbar');sv.setAttribute('height',100);sv.style.width=(100*120/230)+'px';const c=$('qstop').parentNode.getBoundingClientRect().bottom-q.getBoundingClientRect().top-sv.getBoundingClientRect().height;const vh=Math.min(innerHeight,(window.visualViewport&&visualViewport.height)||innerHeight);const H=Math.max(170,Math.min(640,Math.round(vh-c-22)));window.QH=H;sv.setAttribute('height',H);sv.style.width=(H*120/230)+'px';placeEst()}
 window.addEventListener('resize',fitQ);
 $('qbtn').onclick=()=>{window.QON=true;$('qbar').hidden=false;$('qbar').insertBefore($('estd'),$('qprev').parentNode);qGo(0)};
 $('qord').onclick=()=>{try{localStorage.setItem('peshorja_qord',qOrdOn()?'0':'1')}catch(e){}qShow()};
@@ -669,12 +674,27 @@ const nx=nextName(nm);$('sname').value=nx;try{localStorage.setItem('imebar_name'
 items=[];save();render();renderSaved();
 say('✓ U ruajt si "'+nm+'" (shiko te "Të ruajturat"). Vazhdo me "'+nx+'".');
 };
+function gmap(list){const gm={};list.forEach(it=>{if(it.full&&!gm[it.name])gm[it.name]={ml:0,ds:0,f:0,o:0,om:0,v:+it.v||1000,done:false}});
+list.forEach(it=>{const g=gm[it.name];if(g){g.ml+=it.ml;g.ds+=it.doses;if(it.full)g.f++;else{g.o++;g.om+=it.ml}}});return gm}
+function gnote(g){return g.f+(g.f===1?' e mbyllur':' të mbyllura')+(g.o?' + '+g.o+(g.o>1?' të hapura':' e hapur')+' ('+(g.om/1000).toFixed(2)+' L)':'')}
 function render(){
 const L=$('list');L.textContent='';
 if(!items.length){const p=document.createElement('p');p.className='empty';p.textContent='Lista është bosh. Peshoje një shishe dhe shtoje këtu.';L.appendChild(p)}
 let tm=0,td=0;
+const gm=gmap(items);
 items.forEach((it,i)=>{
 tm+=it.ml;td+=it.doses;
+const g=gm[it.name];
+if(g){
+if(!g.done){g.done=true;
+const r=document.createElement('div');r.className='row';const n=document.createElement('div');n.className='n';
+const a=document.createElement('div');a.className='nm';a.textContent=it.name;
+const s=document.createElement('small');s.textContent=(g.ml/1000).toFixed(2)+' L · '+gnote(g)+' · '+Math.round(g.ds*10)/10+' doza';
+const bar=document.createElement('div');bar.className='bar';const bi=document.createElement('i');bi.style.width=Math.max(0,Math.min(100,Math.round(100*g.ml/((g.f+g.o)*g.v))))+'%';bar.appendChild(bi);n.append(a,s,bar);r.append(n);
+const bd=document.createElement('button');bd.type='button';bd.textContent='Fshi';bd.setAttribute('aria-label','Fshi '+it.name);
+arm(bd,'Fshi',()=>{for(let k=items.length-1;k>=0;k--)if(items[k].name===it.name)items.splice(k,1);save();render()});
+r.append(bd);L.appendChild(r)}
+return}
 const r=document.createElement('div');r.className='row';
 const n=document.createElement('div');n.className='n';
 const a=document.createElement('div');a.className='nm';a.textContent=(it.est?'≈ ':'')+it.name;
@@ -684,13 +704,6 @@ const b=document.createElement('button');b.type='button';b.textContent='Fshi';b.
 b.onclick=()=>{items.splice(i,1);save();render()};
 r.append(n,b);L.appendChild(r);
 });
-{const g={};items.forEach(it=>{const x=g[it.name]||(g[it.name]={n:0,ml:0,ds:0});x.n++;x.ml+=it.ml;x.ds+=it.doses});
-const mu=Object.keys(g).filter(k=>g[k].n>1);
-if(mu.length){const bx=document.createElement('div');bx.style.cssText='margin:12px 0 4px;padding:10px 12px;border:1px solid var(--accent);border-radius:12px;background:var(--tint)';
-const h=document.createElement('div');h.textContent='Gjithsej sipas pijes';h.style.cssText='font-weight:700;margin-bottom:6px';bx.appendChild(h);
-mu.forEach(k=>{const r=document.createElement('div');r.style.cssText='display:flex;justify-content:space-between;gap:8px;font-size:15px;padding:3px 0';
-const a=document.createElement('span');a.textContent=k+' · '+g[k].n+' shishe';const b=document.createElement('b');b.textContent=(g[k].ml/1000).toFixed(2)+' L · '+Math.round(g[k].ds*10)/10+' doza';b.style.whiteSpace='nowrap';r.append(a,b);bx.appendChild(r)});
-L.appendChild(bx)}}
 $('tot').style.display=items.length?'flex':'none';
 $('clear').style.display=items.length?'block':'none';
 $('totv').textContent=(tm/1000).toFixed(2)+' L · '+Math.round(td*10)/10+' doza';
