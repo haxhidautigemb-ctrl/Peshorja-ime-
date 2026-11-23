@@ -685,6 +685,13 @@ const b=document.createElement('button');b.type='button';b.textContent='Fshi';b.
 b.onclick=()=>{items.splice(i,1);save();render()};
 r.append(n,b);L.appendChild(r);
 });
+{const g={};items.forEach(it=>{const x=g[it.name]||(g[it.name]={n:0,ml:0,ds:0});x.n++;x.ml+=it.ml;x.ds+=it.doses});
+const mu=Object.keys(g).filter(k=>g[k].n>1);
+if(mu.length){const bx=document.createElement('div');bx.style.cssText='margin:12px 0 4px;padding:10px 12px;border:1px solid var(--accent);border-radius:12px;background:var(--tint)';
+const h=document.createElement('div');h.textContent='Gjithsej sipas pijes';h.style.cssText='font-weight:700;margin-bottom:6px';bx.appendChild(h);
+mu.forEach(k=>{const r=document.createElement('div');r.style.cssText='display:flex;justify-content:space-between;gap:8px;font-size:15px;padding:3px 0';
+const a=document.createElement('span');a.textContent=k+' · '+g[k].n+' shishe';const b=document.createElement('b');b.textContent=(g[k].ml/1000).toFixed(2)+' L · '+Math.round(g[k].ds*10)/10+' doza';b.style.whiteSpace='nowrap';r.append(a,b);bx.appendChild(r)});
+L.appendChild(bx)}}
 $('tot').style.display=items.length?'flex':'none';
 $('clear').style.display=items.length?'block':'none';
 $('totv').textContent=(tm/1000).toFixed(2)+' L · '+Math.round(td*10)/10+' doza';
