@@ -122,10 +122,10 @@ button.pri:active{transform:translateY(1px)}
 [hidden]{display:none!important}
 @media (prefers-reduced-motion:reduce){#fill{transition:none}}
 @media (max-width:380px){.res{gap:14px}.gauge{width:72px}.stat.hero b{font-size:38px}.lcd input{font-size:38px}}
-.tabs{position:sticky;top:0;z-index:5;display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:6px;background:var(--bg);border:1px solid var(--line);border-radius:16px}
-.tabs button{margin:0;padding:12px 8px;border-radius:11px;border:0;background:transparent;color:var(--ink);font:600 16px inherit;font-family:inherit}
+.tabs{position:sticky;top:0;z-index:5;display:grid;grid-template-columns:1fr 1.35fr 1fr;gap:4px;padding:6px;background:var(--bg);border:1px solid var(--line);border-radius:16px}
+.tabs button{white-space:nowrap;margin:0;padding:12px 2px;border-radius:11px;border:0;background:transparent;color:var(--ink);font:600 15px inherit;font-family:inherit}
 .tabs button[aria-selected="true"]{background:var(--accent);color:var(--onaccent)}
-.tabs b{display:inline-block;min-width:22px;padding:1px 6px;margin-left:6px;border-radius:99px;background:var(--liq2);color:#12201c;font-size:14px}
+.tabs b{display:inline-block;min-width:20px;padding:1px 5px;margin-left:4px;border-radius:99px;background:var(--liq2);color:#12201c;font-size:14px}
 .det{margin:2px 0 12px;padding:10px 12px;border-radius:12px;background:var(--bg);border:1px solid var(--line)}.di{display:flex;justify-content:space-between;gap:10px;padding:6px 0;font-size:15px;border-bottom:1px solid var(--line)}.di:last-child{border:0}.di b{white-space:nowrap}.tt{font-weight:700}
 .tgt{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-radius:14px;background:var(--liq2);color:#12201c;font-weight:600}.tgt button{margin:0;width:auto;padding:8px 14px;background:#12201c;color:#f3fbf7;border:0;border-radius:10px}
 .lnk{width:100%;margin-top:10px;background:var(--tint);border-style:dashed;color:var(--accent);font-weight:600}
@@ -151,7 +151,7 @@ button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touc
 <div><h1>Peshorja e barit</h1><p>Peshoje shishen dhe shiko sa ka mbetur.</p></div>
 <button type="button" id="thm" aria-label="Ndrysho pamjen" style="margin-left:auto;min-height:40px;min-width:40px;padding:6px 10px;font-size:18px;line-height:1;flex:none"></button>
 </header>
-<div class="tabs" role="tablist"><button type="button" id="tab1" role="tab" aria-selected="true">Peshorja</button><button type="button" id="tab2" role="tab" aria-selected="false">Të ruajturat<b id="cnt">0</b></button></div>
+<div class="tabs" role="tablist"><button type="button" id="tab1" role="tab" aria-selected="true">Peshorja</button><button type="button" id="tab2" role="tab" aria-selected="false">Të ruajturat<b id="cnt">0</b></button><button type="button" id="tab3" role="tab" aria-selected="false">Pasqyra</button></div>
 <div class="tgt" id="tgt" hidden><span id="tgtn"></span><button type="button" id="tgtx">Mbaro</button></div>
 
 <div class="card" id="qbar" hidden>
@@ -397,6 +397,10 @@ button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touc
 <textarea id="cp" hidden readonly aria-label="Teksti i inventarit"></textarea>
 </section>
 
+<section class="card" id="dashcard" hidden>
+<div class="head"><h2>Pasqyra e barit</h2></div>
+<div id="dash"></div>
+</section>
 <section class="card" id="savedcard" hidden>
 <p class="empty" id="svempty">Ende asgjë e ruajtur. Kur të prekësh "Ruaj", shanku shfaqet këtu.</p>
 <div class="head"><h2>Inventarët e ruajtur</h2></div>
@@ -519,7 +523,42 @@ function alert0(){const b=$('tab2');b.textContent='Pastro listën fillimisht';se
 function arm(btn,label,fn){let t=null;btn.onclick=()=>{if(t===null){btn.textContent='Sigurt?';t=setTimeout(()=>{t=null;btn.textContent=label},3000);return}clearTimeout(t);t=null;btn.textContent=label;fn()}}
 function saveLocalSaved(){try{localStorage.setItem('imebar_saved',JSON.stringify(saved))}catch(e){}}
 let view=1,target=null,edit=null;
-function setView(v){view=v;document.querySelectorAll('.vm').forEach(e=>e.hidden=v!==1);$('savedcard').hidden=v!==2;$('tab1').setAttribute('aria-selected',v===1);$('tab2').setAttribute('aria-selected',v===2);$('listcard').hidden=v!==1||!!target;$('tgt').hidden=!((target||edit)&&v===1);if($('qbar'))$('qbar').hidden=!(window.QON&&v===1);window.scrollTo({top:0})}
+
+function dashRender(){const D=$('dash');D.textContent='';
+const rs=ordered();
+const mk=(t,c,st)=>{const e=document.createElement(t);if(c)e.className=c;if(st)e.style.cssText=st;return e};
+if(!rs.length){const p=mk('p','hint');p.textContent='Ende nuk ke asnjë inventar të ruajtur. Bëj një inventar dhe shtyp "Ruaj", dhe këtu shfaqet pasqyra e barit.';D.appendChild(p);return}
+const r=rs[rs.length-1],pv=rs.length>1?rs[rs.length-2]:null;
+const catOf=t=>{const o=[...$('type').options].find(x=>x.value===t);return o&&o.parentElement&&o.parentElement.label?o.parentElement.label:'Të tjera'};
+const capOf=x=>{const v=parseFloat(x.v);if(v>0)return v;return x.pct>0?x.ml*100/x.pct:x.ml};
+let ml=0,cap=0,ds=0;const cats={},drinks={};
+r.items.forEach(x=>{const c=capOf(x);ml+=x.ml;cap+=c;ds+=x.doses;const k=catOf(x.t);const g=cats[k]||(cats[k]={ml:0,cap:0});g.ml+=x.ml;g.cap+=c;const d=drinks[x.name]||(drinks[x.name]={ml:0,one:c,n:0});d.ml+=x.ml;d.n++});
+const pct=cap?Math.round(100*ml/cap):0;
+const top=mk('div','',"display:flex;align-items:center;gap:16px;margin:4px 0 14px");
+const NS='http://www.w3.org/2000/svg';const sv=document.createElementNS(NS,'svg');sv.setAttribute('width','132');sv.setAttribute('height','132');sv.setAttribute('viewBox','0 0 132 132');sv.style.flex='none';
+const c1=document.createElementNS(NS,'circle');[['cx',66],['cy',66],['r',54],['fill','none'],['stroke','var(--tint)'],['stroke-width',14]].forEach(a=>c1.setAttribute(a[0],a[1]));
+const c2=document.createElementNS(NS,'circle');[['cx',66],['cy',66],['r',54],['fill','none'],['stroke',pct<25?'var(--err)':'var(--accent)'],['stroke-width',14],['stroke-linecap','round'],['stroke-dasharray',(339.3*Math.min(100,pct)/100).toFixed(1)+' 339.3'],['transform','rotate(-90 66 66)']].forEach(a=>c2.setAttribute(a[0],a[1]));
+const tx=document.createElementNS(NS,'text');[['x',66],['y',74],['text-anchor','middle'],['font-size',30],['font-weight',800],['fill','var(--ink)']].forEach(a=>tx.setAttribute(a[0],a[1]));tx.textContent=pct+'%';
+sv.append(c1,c2,tx);
+const side=mk('div','',"min-width:0");
+const t1=mk('div','',"font-weight:700;font-size:17px");t1.textContent='Bari është '+pct+'% plot';
+const t2=mk('div','',"color:var(--mute);font-size:14px;margin-top:2px");t2.textContent=r.name+' · '+dstr(r.date);
+side.append(t1,t2);
+if(pv){const pm=sums(pv.items).ml,df=ml-pm;const t3=mk('div','',"margin-top:8px;font-size:14px;font-weight:600;color:"+(df<0?'var(--liq)':'var(--accent)'));t3.textContent=(df<0?'▼ ':'▲ ')+(Math.abs(df)/1000).toFixed(2)+' L nga '+pv.name;side.appendChild(t3)}
+top.append(sv,side);D.appendChild(top);
+const st=mk('div','',"display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px");
+[[L2(ml)+' L','Gjithsej'],[String(Math.round(ds)),'Doza'],[String(Object.keys(drinks).length),'Pije']].forEach(a=>{const b=mk('div','',"background:var(--tint);border-radius:12px;padding:10px 6px;text-align:center");const n=mk('div','',"font-weight:800;font-size:18px");n.textContent=a[0];const l=mk('div','',"font-size:12px;color:var(--mute)");l.textContent=a[1];b.append(n,l);st.appendChild(b)});
+D.appendChild(st);
+const h2=mk('div','',"font-weight:700;margin:4px 0 8px");h2.textContent='Sipas kategorisë';D.appendChild(h2);
+Object.keys(cats).sort((a,b)=>cats[b].ml-cats[a].ml).forEach(k=>{const g=cats[k],p=g.cap?Math.round(100*g.ml/g.cap):0;
+const w=mk('div','',"margin-bottom:10px");const row=mk('div','',"display:flex;justify-content:space-between;gap:8px;font-size:14px;margin-bottom:3px");
+const a=document.createElement('span');a.textContent=k;const b=document.createElement('b');b.textContent=L2(g.ml)+' L · '+p+'% plot';b.style.whiteSpace='nowrap';row.append(a,b);
+const tr=mk('div','',"height:10px;border-radius:6px;background:var(--tint);overflow:hidden");const fl=mk('div','',"height:100%;border-radius:6px;background:"+(p<25?'var(--err)':'var(--accent)')+";width:"+Math.max(2,p)+'%');tr.appendChild(fl);w.append(row,tr);D.appendChild(w)});
+const low=Object.keys(drinks).map(k=>({n:k,ml:drinks[k].ml,r:drinks[k].ml/drinks[k].one})).filter(x=>x.r<0.5).sort((a,b)=>a.r-b.r).slice(0,3);
+if(low.length){const h3=mk('div','',"font-weight:700;margin:14px 0 8px");h3.textContent='⚠ Po mbarojnë';D.appendChild(h3);
+low.forEach(x=>{const row=mk('div','',"display:flex;justify-content:space-between;gap:8px;padding:8px 10px;margin-bottom:6px;border-radius:10px;background:var(--tint);font-size:15px");const a=document.createElement('span');a.textContent=x.n;const b=document.createElement('b');b.textContent=L2(x.ml)+' L mbetur';b.style.whiteSpace='nowrap';row.append(a,b);D.appendChild(row)})}
+}
+function setView(v){view=v;document.querySelectorAll('.vm').forEach(e=>e.hidden=v!==1);$('savedcard').hidden=v!==2;$('dashcard').hidden=v!==3;$('tab3').setAttribute('aria-selected',v===3);if(v===3)dashRender();$('tab1').setAttribute('aria-selected',v===1);$('tab2').setAttribute('aria-selected',v===2);$('listcard').hidden=v!==1||!!target;$('tgt').hidden=!((target||edit)&&v===1);if($('qbar'))$('qbar').hidden=!(window.QON&&v===1);window.scrollTo({top:0})}
 function endEdit(){const w=edit&&edit.rec?2:1;edit=null;$('add').textContent='Shto në listë';$('cur').value='';calc();setView(w)}
 $('tgtx').onclick=()=>{if(edit){endEdit();return}target=null;setView(2)};
 function startEdit(arr,idx,rec){
@@ -530,7 +569,7 @@ if(!tv){say('Kjo pije nuk gjendet në listë. Fshije dhe shtoje përsëri.');ret
 target=null;edit={arr:arr,idx:idx,rec:rec};
 $('type').value=tv;pick();if(vv)$('vol').value=vv;loadW();$('cur').value=x.g||'';calc();
 $('tgtn').textContent='Po ndryshon peshën: '+x.name;$('add').textContent='Ruaj ndryshimin';setView(1);$('cur').focus()}
-$('tab1').onclick=()=>{setView(1)};$('tab2').onclick=()=>setView(2);
+$('tab1').onclick=()=>{setView(1)};$('tab2').onclick=()=>setView(2);$('tab3').onclick=()=>{target=null;setView(3)};
 function renderSaved(){
 const S=$('saved');S.textContent='';
 $('cnt').textContent=saved.length;$('svempty').hidden=!!saved.length;if(typeof fillCmp==='function')fillCmp();$('allacts').hidden=saved.length<2;
