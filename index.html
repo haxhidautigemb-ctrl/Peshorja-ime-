@@ -459,8 +459,8 @@ if(fR!==''&&eR!==''){f=+fR;e=+eR;if(!(f>e)){$('err').textContent='Shishja e plot
 else if(fR!==''){f=+fR;e=f-v*dens;src='Rezultat i mirë, bazuar në peshën e plotë që e shkrove.';const k=wkey(),D=DEF[k];if(D&&D.est&&!(wts[k]&&wts[k].f)&&fR===D.f)src='Pesha e plotë është e vlerësuar nga lista, jo e matur, ndaj gabimi mund të arrijë rreth 60 ml. Për më saktë, peshoje një shishe të re të mbyllur dhe shkruaje te "Kam pesha të sakta".'}
 else if(eR!==''){e=+eR;f=e+v*dens;src='Rezultat i mirë, bazuar në peshën e zbrazët që e shkrove.'}
 else{e=GLASS[v]||480;f=e+v*dens;src='Rezultat përafërsisht (gabim rreth 50-100 ml), sepse xhami ndryshon nga marka. Për më saktë, shto peshën e plotë ose të zbrazët më lart.'}
-if(c<e-5){$('err').textContent='Shishja peshon më pak se një shishe e zbrazët. Kontrollo peshën.';return}
-if(c>f+5){$('err').textContent='Shishja peshon më shumë se një shishe e plotë. Kontrollo peshën.';return}
+if(c<e-5){$('err').textContent=gMsg(c,e,f,-1);return}
+if(c>f+5){$('err').textContent=gMsg(c,e,f,1);return}
 $('err').textContent='';
 $('note').textContent=EST?'Përafërsisht, nga vija (gabim 5–10%). Për inventar të saktë peshoje shishen.':src;
 const ml=Math.max(0,Math.min(v,(c-e)/dens)),ds=Math.round(ml/d*10)/10;
@@ -477,6 +477,12 @@ if(k!==GK0){GK0=k;$('gcp').setAttribute('d',sh.d);
 if(PI){const pad=6;g.setAttribute('viewBox',(PI.x-pad)+' '+(PI.y-4)+' '+(PI.w+pad*2)+' '+(PI.h+8));const m=$('gimg');m.setAttribute('href',PI.u);m.setAttribute('x',PI.x);m.setAttribute('y',PI.y);m.setAttribute('width',PI.w);m.setAttribute('height',PI.h);$('gout').style.display='none';$('gdim').style.display=''}
 else{const bb=(function(){const t=document.createElementNS('http://www.w3.org/2000/svg','path');t.setAttribute('d',sh.d);return t})();g.setAttribute('viewBox','20 2 80 226');$('gimg').setAttribute('width',0);$('gout').setAttribute('d',sh.d);$('gout').style.display='';$('gdim').style.display='none'}}
 const y=yOf(k,Math.max(0,Math.min(100,p||0)));$('glv').style.transform='translateY('+y+'px)';const gl=$('gglow');if(gl){gl.setAttribute('cy',Math.min(224,y+22));gl.setAttribute('cx',PI?(+PI.x+PI.w/2):60);gl.setAttribute('rx',PI?PI.w*1.3:60);gl.setAttribute('ry',PI?PI.w*1.0:50)}}catch(e){}}
+function gMsg(c,e,f,dir){const E=Math.round(e),F=Math.round(f),lo=e-5,hi=f+5;
+let m=dir>0?'Kontrollo: '+c+' g është më shumë se shishja e plotë (≈ '+F+' g).':'Kontrollo: '+c+' g është më pak se shishja e zbrazët (≈ '+E+' g).';
+m+=' Për këtë pije: e zbrazët ≈ '+E+' g, e plotë ≈ '+F+' g.';
+if(dir>0){const a=Math.round(c/10);if(a>=lo&&a<=hi)m+=' Ke shtuar një shifër më shumë? Mund të jetë '+a+' g.';else if(c<=f+80)m+=' Mund të jetë shishe tjetër ose madhësi tjetër: kontrollo "Madhësia e shishes".'}
+else{const a=c*10;if(a>=lo&&a<=hi)m+=' Ke harruar një shifër? Mund të jetë '+a+' g.';else m+=' Kontrollo peshoren ose pijen e zgjedhur.'}
+return m}
 function pad(n){return String(n).padStart(2,'0')}
 function dstr(iso){const d=new Date(iso);return pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear()}
 function L2(ml){return (ml/1000).toFixed(2)}
